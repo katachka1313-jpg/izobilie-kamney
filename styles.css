@@ -86,9 +86,8 @@ img {
   flex: 0 0 clamp(50px, 4.5vw, 58px);
   border-radius: 50%;
   background: #fff7ec;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
-  mix-blend-mode: multiply;
 }
 
 .brand-logo span {
@@ -514,10 +513,9 @@ h3 {
   border-radius: 50%;
   padding: 0;
   background: #fff7ec;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   box-shadow: 0 14px 34px rgba(88, 65, 42, 0.08);
-  mix-blend-mode: multiply;
   opacity: 0.92;
 }
 
@@ -1320,9 +1318,8 @@ h3 {
   flex: 0 0 58px;
   border-radius: 50%;
   background: #fff7ec;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
-  mix-blend-mode: multiply;
 }
 
 .footer-brand div {
