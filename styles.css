@@ -66,12 +66,14 @@ img {
 .logo {
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(20px, 2vw, 25px);
+  font-size: clamp(18px, 1.65vw, 22px);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.08;
   text-decoration: none;
   white-space: nowrap;
+  letter-spacing: 0.045em;
 }
+
 
 .brand-logo {
   display: inline-flex;
@@ -93,6 +95,7 @@ img {
 }
 
 .brand-logo span {
+  min-width: 0;
   white-space: nowrap;
 }
 
@@ -584,18 +587,27 @@ h3 {
 }
 
 .option-card {
+  display: flex;
   min-height: 158px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-card h3 {
+  margin: 0;
+  line-height: 1.3;
 }
 
 .option-card p {
-  margin: 10px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: 16px;
 }
 
 .format-card {
-  display: grid;
-  align-content: start;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -603,6 +615,11 @@ h3 {
 .format-card p,
 .format-card ul {
   margin: 0;
+}
+
+.format-card h3 {
+  min-height: 56px;
+  line-height: 1.3;
 }
 
 .format-card p,
@@ -626,6 +643,8 @@ h3 {
 }
 
 .format-price {
+  margin-top: auto !important;
+  padding-top: 10px;
   color: var(--gold) !important;
   font-weight: 800;
 }
@@ -851,22 +870,23 @@ h3 {
 .work-card > img,
 .work-carousel {
   width: 100%;
-  aspect-ratio: 1 / 0.88;
-  display: grid;
-  place-items: center;
+  height: clamp(260px, 28vw, 330px);
+  display: block;
   border-bottom: 1px solid rgba(184, 145, 73, 0.1);
-  background: linear-gradient(135deg, rgba(255, 253, 248, 0.94), rgba(250, 241, 230, 0.72));
+  background: var(--soft);
 }
 
 .work-card > img,
 .work-carousel img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   object-position: center center;
 }
 
 .work-card > img {
-  height: auto;
-  padding: 4px;
+  height: clamp(260px, 28vw, 330px);
+  padding: 12px;
 }
 
 .work-carousel {
@@ -879,7 +899,7 @@ h3 {
   inset: 0;
   width: 100%;
   height: 100%;
-  padding: 4px;
+  padding: 12px;
   opacity: 0;
   transition: opacity 180ms ease;
 }
@@ -946,10 +966,10 @@ h3 {
 
 .work-body h3 {
   align-self: start;
-  min-height: 44px;
+  min-height: 46px;
   margin: 0;
   font-size: 17px;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .work-body p {
@@ -991,7 +1011,8 @@ h3 {
 
 .work-price {
   margin-top: auto;
-  padding-top: 8px;
+  min-height: 48px;
+  padding-top: 10px;
   color: var(--caramel) !important;
   font-size: 18px;
   line-height: 1.3;
@@ -1560,11 +1581,16 @@ h3 {
   }
 
   .logo {
-    font-size: 20px;
+    max-width: min(58vw, 260px);
+    font-size: clamp(14px, 4.2vw, 18px);
   }
 
   .brand-logo {
     gap: 8px;
+  }
+
+  .brand-logo span {
+    white-space: normal;
   }
 
   .brand-logo img {
@@ -1709,7 +1735,7 @@ h3 {
 
   .work-card > img,
   .work-carousel {
-    aspect-ratio: 1 / 0.9;
+    height: clamp(230px, 70vw, 300px);
   }
 
   .work-body {
@@ -1724,6 +1750,10 @@ h3 {
   .work-body .work-spec,
   .work-description,
   .work-body strong {
+    min-height: 0;
+  }
+
+  .format-card h3 {
     min-height: 0;
   }
 
