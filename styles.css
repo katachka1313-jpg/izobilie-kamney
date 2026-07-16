@@ -28,12 +28,15 @@
 }
 
 html {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 body {
   width: 100%;
+  max-width: 100%;
   margin: 0;
   overflow-x: hidden;
   background:
@@ -1674,12 +1677,12 @@ h3 {
   }
 
   .hero {
-    width: min(100% - 28px, 1120px);
+    width: 100%;
     max-width: 100%;
-    margin-right: auto;
-    margin-left: auto;
+    margin-right: 0;
+    margin-left: 0;
     min-height: 560px;
-    padding: 26px 22px 34px;
+    padding: 26px max(18px, env(safe-area-inset-left)) 34px max(18px, env(safe-area-inset-right));
     align-items: flex-start;
     background:
       linear-gradient(180deg, rgba(255, 250, 243, 0.99) 0%, rgba(255, 250, 243, 0.96) 44%, rgba(255, 250, 243, 0.82) 66%, rgba(255, 250, 243, 0.48) 100%),
@@ -1689,14 +1692,27 @@ h3 {
   }
 
   .hero::before {
-    right: 22px;
-    left: 22px;
+    right: max(18px, env(safe-area-inset-right));
+    left: max(18px, env(safe-area-inset-left));
     width: auto;
-    max-width: calc(100% - 44px);
+    max-width: none;
   }
 
   .hero::after {
     display: none;
+  }
+
+  .hero-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-brand-watermark {
+    right: -72px;
+    bottom: 22px;
+    width: min(280px, 78vw);
+    max-width: calc(100vw - 36px);
   }
 
   h1 {
@@ -1749,7 +1765,15 @@ h3 {
     width: 100%;
   }
 
+  .badges {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
   .badges span {
+    min-width: 0;
     min-height: 62px;
     gap: 8px;
     font-size: 12px;
@@ -1805,7 +1829,10 @@ h3 {
 
   .work-card > img,
   .work-carousel {
+    flex: 0 0 auto;
+    width: 100%;
     max-width: 100%;
+    height: auto;
     aspect-ratio: 1 / 0.82;
   }
 
@@ -1822,17 +1849,20 @@ h3 {
     display: flex;
     min-width: 0;
     min-height: 0;
-    flex: 1 1 auto;
+    height: auto;
+    flex: 0 1 auto;
     flex-direction: column;
     gap: 12px;
     padding: 16px 16px 20px;
+    overflow: visible;
     overflow-wrap: anywhere;
   }
 
   .work-footer {
+    position: static;
     min-height: 0;
     gap: 12px;
-    margin-top: 0;
+    margin-top: 6px;
     padding-top: 12px;
   }
 
@@ -1851,11 +1881,13 @@ h3 {
   }
 
   .work-body h3,
+  .work-type,
   .work-stones,
   .work-body .work-spec,
   .work-description,
   .work-body strong {
     min-height: 0;
+    line-height: 1.45;
   }
 
   .format-card h3 {
