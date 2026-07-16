@@ -21,7 +21,9 @@
   --section-gap: clamp(38px, 5.2vw, 64px);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -1635,6 +1637,7 @@ h3 {
   }
 
   .site-header {
+    max-width: 100%;
     padding: 12px max(14px, env(safe-area-inset-left)) 12px max(14px, env(safe-area-inset-right));
   }
 
@@ -1672,6 +1675,9 @@ h3 {
 
   .hero {
     width: min(100% - 28px, 1120px);
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
     min-height: 560px;
     padding: 26px 22px 34px;
     align-items: flex-start;
@@ -1683,7 +1689,10 @@ h3 {
   }
 
   .hero::before {
-    width: 72%;
+    right: 22px;
+    left: 22px;
+    width: auto;
+    max-width: calc(100% - 44px);
   }
 
   .hero::after {
@@ -1796,26 +1805,34 @@ h3 {
 
   .work-card > img,
   .work-carousel {
+    max-width: 100%;
     aspect-ratio: 1 / 0.82;
   }
 
   .work-card {
-    min-height: auto;
-    overflow: visible;
+    display: flex;
+    max-width: 100%;
+    min-height: 0;
+    height: auto;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .work-body {
     display: flex;
+    min-width: 0;
     min-height: 0;
     flex: 1 1 auto;
     flex-direction: column;
     gap: 12px;
     padding: 16px 16px 20px;
+    overflow-wrap: anywhere;
   }
 
   .work-footer {
     min-height: 0;
     gap: 12px;
+    margin-top: 0;
     padding-top: 12px;
   }
 
@@ -1823,11 +1840,14 @@ h3 {
     display: block;
     min-height: 0;
     width: 100%;
+    line-height: 1.35;
   }
 
   .work-body .button.small {
     width: 100%;
+    max-width: 100%;
     margin-top: 0;
+    white-space: normal;
   }
 
   .work-body h3,
