@@ -60,18 +60,16 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
 
   const scrollToSlide = (index) => {
     const nextIndex = (index + slides.length) % slides.length;
-    slides[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    slides[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
     updateDots(nextIndex);
   };
 
   const findClosestSlide = () => {
-    const trackCenter = track.getBoundingClientRect().left + track.clientWidth / 2;
+    const trackLeft = track.getBoundingClientRect().left;
     return slides.reduce((closestIndex, slide, index) => {
-      const slideRect = slide.getBoundingClientRect();
-      const slideCenter = slideRect.left + slideRect.width / 2;
-      const closestRect = slides[closestIndex].getBoundingClientRect();
-      const closestCenter = closestRect.left + closestRect.width / 2;
-      return Math.abs(slideCenter - trackCenter) < Math.abs(closestCenter - trackCenter) ? index : closestIndex;
+      const slideLeft = slide.getBoundingClientRect().left;
+      const closestLeft = slides[closestIndex].getBoundingClientRect().left;
+      return Math.abs(slideLeft - trackLeft) < Math.abs(closestLeft - trackLeft) ? index : closestIndex;
     }, 0);
   };
 
