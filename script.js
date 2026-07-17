@@ -36,6 +36,59 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
   next?.addEventListener("click", () => showImage(activeIndex + 1));
 });
 
+document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
+  const track = carousel.querySelector(".stones-carousel-track");
+  const slides = Array.from(carousel.querySelectorAll(".stones-carousel-slide"));
+  const dots = Array.from(carousel.querySelectorAll("[data-stones-dot]"));
+  const prev = carousel.querySelector("[data-stones-prev]");
+  const next = carousel.querySelector("[data-stones-next]");
+
+  if (!track || slides.length === 0) {
+    return;
+  }
+
+  let activeIndex = 0;
+
+  const updateDots = (index) => {
+    activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+    dots.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === activeIndex;
+      dot.classList.toggle("is-active", isActive);
+      dot.setAttribute("aria-current", isActive ? "true" : "false");
+    });
+  };
+
+  const scrollToSlide = (index) => {
+    const nextIndex = (index + slides.length) % slides.length;
+    slides[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    updateDots(nextIndex);
+  };
+
+  const findClosestSlide = () => {
+    const trackCenter = track.getBoundingClientRect().left + track.clientWidth / 2;
+    return slides.reduce((closestIndex, slide, index) => {
+      const slideRect = slide.getBoundingClientRect();
+      const slideCenter = slideRect.left + slideRect.width / 2;
+      const closestRect = slides[closestIndex].getBoundingClientRect();
+      const closestCenter = closestRect.left + closestRect.width / 2;
+      return Math.abs(slideCenter - trackCenter) < Math.abs(closestCenter - trackCenter) ? index : closestIndex;
+    }, 0);
+  };
+
+  prev?.addEventListener("click", () => scrollToSlide(activeIndex - 1));
+  next?.addEventListener("click", () => scrollToSlide(activeIndex + 1));
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => scrollToSlide(Number(dot.dataset.stonesDot)));
+  });
+
+  track.addEventListener("scroll", () => {
+    window.requestAnimationFrame(() => updateDots(findClosestSlide()));
+  }, { passive: true });
+
+  requestAnimationFrame(() => scrollToSlide(0));
+});
+
 const requestForm = document.querySelector("#request-form");
 const requestError = document.querySelector("#request-error");
 

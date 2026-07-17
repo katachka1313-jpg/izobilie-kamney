@@ -625,22 +625,6 @@ h3 {
 }
 
 
-.stones-visual {
-  max-width: 100%;
-  margin: 0 auto 28px;
-  overflow: hidden;
-  border: 1px solid rgba(184, 145, 73, 0.18);
-  border-radius: 28px;
-  background: rgba(255, 253, 248, 0.78);
-  box-shadow: 0 22px 52px rgba(88, 65, 42, 0.12);
-}
-
-.stones-visual img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .care {
   border: 1px solid rgba(184, 145, 73, 0.14);
   border-radius: 22px;
@@ -780,44 +764,90 @@ h3 {
   max-width: 820px;
 }
 
-.stone-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: stretch;
+.stones-carousel {
+  position: relative;
+  width: min(100%, 1120px);
+  max-width: 100%;
+  margin: 0 auto 28px;
 }
 
-.stone-card {
+.stones-carousel-track {
   display: flex;
-  min-height: 100%;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 0;
+  gap: clamp(14px, 2vw, 24px);
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-inline: clamp(12px, 8vw, 104px);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-.stone-card img {
-  width: 100%;
-  height: clamp(150px, 15vw, 190px);
-  object-fit: cover;
-  object-position: center center;
-  background: var(--soft);
+.stones-carousel-track::-webkit-scrollbar {
+  display: none;
 }
 
-.stone-card-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 18px 20px;
-}
-
-.stone-card p {
+.stones-carousel-slide {
+  flex: 0 0 min(78%, 860px);
   margin: 0;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.5;
+  overflow: hidden;
+  border: 1px solid rgba(184, 145, 73, 0.18);
+  border-radius: 28px;
+  background: rgba(255, 253, 248, 0.78);
+  box-shadow: 0 22px 52px rgba(88, 65, 42, 0.12);
+  scroll-snap-align: center;
 }
 
-.stone-card strong {
-  color: var(--ink);
+.stones-carousel-slide img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.stones-carousel-button {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 1px solid rgba(184, 145, 73, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: 0 12px 30px rgba(88, 65, 42, 0.16);
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.stones-carousel-button-prev { left: clamp(8px, 2vw, 18px); }
+.stones-carousel-button-next { right: clamp(8px, 2vw, 18px); }
+
+.stones-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.stones-carousel-dots button {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  background: rgba(184, 145, 73, 0.28);
+  cursor: pointer;
+}
+
+.stones-carousel-dots button.is-active {
+  width: 26px;
+  background: var(--gold);
 }
 
 .stone-wide-note {
@@ -1659,6 +1689,16 @@ h3 {
   }
 }
 
+@media (max-width: 900px) {
+  .stones-carousel-track {
+    scroll-padding-inline: 16px;
+  }
+
+  .stones-carousel-slide {
+    flex-basis: 88%;
+  }
+}
+
 @media (max-width: 680px) {
   :root {
     --section-gap: 38px;
@@ -1833,19 +1873,17 @@ h3 {
     padding: 18px;
   }
 
-  .stones-visual {
+  .stones-carousel {
     margin-bottom: 22px;
+  }
+
+  .stones-carousel-slide {
+    flex-basis: 92%;
     border-radius: 18px;
   }
 
-  .stone-card {
-    min-height: auto;
-  }
-
-  .stone-card-body {
-    display: flex;
-    flex-direction: column;
-    padding: 18px;
+  .stones-carousel-button {
+    display: none;
   }
 
   .memory-note {
