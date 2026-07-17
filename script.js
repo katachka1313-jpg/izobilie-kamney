@@ -36,6 +36,32 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
   next?.addEventListener("click", () => showImage(activeIndex + 1));
 });
 
+
+document.querySelectorAll("[data-works-carousel]").forEach((carousel) => {
+  const track = carousel.querySelector(".works-carousel-track");
+  const cards = Array.from(carousel.querySelectorAll(".work-card"));
+  const prev = carousel.querySelector("[data-works-prev]");
+  const next = carousel.querySelector("[data-works-next]");
+
+  if (!track || cards.length === 0) {
+    return;
+  }
+
+  const getStep = () => {
+    const firstCard = cards[0];
+    const styles = window.getComputedStyle(track);
+    const gap = Number.parseFloat(styles.columnGap || styles.gap) || 0;
+    return firstCard.getBoundingClientRect().width + gap;
+  };
+
+  const scrollByCard = (direction) => {
+    track.scrollBy({ left: getStep() * direction, behavior: "smooth" });
+  };
+
+  prev?.addEventListener("click", () => scrollByCard(-1));
+  next?.addEventListener("click", () => scrollByCard(1));
+});
+
 document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
   const track = carousel.querySelector(".stones-carousel-track");
   const slides = Array.from(carousel.querySelectorAll(".stones-carousel-slide"));

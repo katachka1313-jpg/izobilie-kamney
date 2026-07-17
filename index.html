@@ -209,8 +209,10 @@
         <h2>Украшения, созданные мастером</h2>
         <p>Здесь собраны украшения, которые уже были созданы мастером. Можно заказать похожее изделие, собрать комплект или оформить индивидуальный подбор по дате рождения, цвету, размеру и личному запросу.</p>
       </div>
-      <div class="work-grid">
-        <article class="work-card">
+      <div class="works-carousel" data-works-carousel aria-label="Карусель примеров украшений">
+        <button class="works-carousel-button works-carousel-button-prev" type="button" aria-label="Предыдущие примеры украшений" data-works-prev>‹</button>
+        <div class="work-grid works-carousel-track" tabindex="0">
+          <article class="work-card">
           <img src="assets/фото%20примеры/серьги%201.png" alt="Серьги ручной работы" width="1254" height="1254" loading="lazy">
           <div class="work-body">
             <h3>Серьги ручной работы</h3>
@@ -511,7 +513,9 @@
               <a class="button small" href="#request">Заказать похожее</a>
             </div>
           </div>
-        </article>
+          </article>
+        </div>
+        <button class="works-carousel-button works-carousel-button-next" type="button" aria-label="Следующие примеры украшений" data-works-next>›</button>
       </div>
       <div class="examples-note">
         <p>Все украшения можно повторить в похожем стиле, но точное совпадение оттенков и рисунка камней не всегда возможно: натуральные камни отличаются по цвету, форме, размеру и внутреннему рисунку.</p>
