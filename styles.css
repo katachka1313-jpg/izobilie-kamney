@@ -502,10 +502,8 @@ h3 {
 }
 
 .about {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  align-items: center;
-  gap: clamp(48px, 5vw, 68px);
+  display: flex;
+  justify-content: center;
   border-top: 1px solid rgba(184, 145, 73, 0.16);
   padding-top: clamp(48px, 5.5vw, 72px);
   padding-bottom: clamp(48px, 5.5vw, 72px);
@@ -517,15 +515,15 @@ h3 {
   align-items: center;
   gap: 14px 24px;
   width: 100%;
-  max-width: 720px;
-  justify-self: end;
+  max-width: 920px;
+  margin: 0 auto;
   min-height: 0;
   border: 1px solid rgba(184, 145, 73, 0.16);
-  border-radius: 8px;
-  padding: clamp(20px, 3vw, 28px);
+  border-radius: 22px;
+  padding: clamp(22px, 3.6vw, 34px);
   background:
-    radial-gradient(circle at 0 0, rgba(234, 214, 168, 0.24), transparent 38%),
-    rgba(255, 253, 248, 0.66);
+    radial-gradient(circle at 92% 6%, rgba(234, 214, 168, 0.24), transparent 30%),
+    linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(247, 239, 230, 0.74));
   box-shadow: 0 18px 44px rgba(88, 65, 42, 0.06);
   color: var(--muted);
   font-size: clamp(17px, 1.7vw, 19px);
@@ -1255,33 +1253,6 @@ h3 {
   line-height: 1.55;
 }
 
-.personal-request {
-  padding-top: 0;
-}
-
-.personal-request-card {
-  width: min(820px, 100%);
-  margin: 0 auto;
-  border: 1px solid rgba(184, 145, 73, 0.16);
-  border-radius: 22px;
-  padding: clamp(22px, 3.6vw, 34px);
-  background:
-    radial-gradient(circle at 92% 6%, rgba(234, 214, 168, 0.24), transparent 30%),
-    linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(247, 239, 230, 0.74));
-  box-shadow: 0 18px 44px rgba(88, 65, 42, 0.07);
-}
-
-.personal-request-card h2 {
-  max-width: 640px;
-}
-
-.personal-request-card p:not(.eyebrow) {
-  max-width: 700px;
-  margin: 14px 0 0;
-  color: var(--muted);
-  font-size: clamp(17px, 1.8vw, 19px);
-  line-height: 1.58;
-}
 
 .order-wish {
   max-width: 860px;
@@ -1761,7 +1732,6 @@ h3 {
     border-top: 1px solid rgba(184, 145, 73, 0.16);
   }
 
-  .about,
   .stone-note,
   .birth-date,
   .request,
@@ -1939,7 +1909,6 @@ h3 {
 
   .stone-note,
   .birth-date,
-  .personal-request,
   .payment,
   .price-factors,
   .stone-values,
@@ -2233,15 +2202,6 @@ h3 {
     min-height: 52px;
     margin-top: 0;
     white-space: normal;
-  }
-
-  .personal-request-card {
-    padding: 20px;
-  }
-
-  .personal-request-card p:not(.eyebrow) {
-    font-size: 16px;
-    line-height: 1.5;
   }
 
   .order-wish {
