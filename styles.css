@@ -324,7 +324,8 @@ h1,
 h2,
 h3,
 p {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 h1,
@@ -528,7 +529,7 @@ h3 {
 }
 
 .about-brand-logo {
-  grid-row: 1 / span 2;
+  grid-row: 1 / -1;
   width: clamp(112px, 12vw, 142px);
   height: clamp(112px, 12vw, 142px);
   aspect-ratio: 1 / 1;
@@ -549,7 +550,12 @@ h3 {
 }
 
 .about-text p {
+  grid-column: 2;
+  min-width: 0;
   margin: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .about-text p:last-child {
@@ -2216,9 +2222,13 @@ h3 {
   }
 
   .about-text {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
     padding: 18px;
+  }
+
+  .about-text p {
+    grid-column: auto;
   }
 
   .about-brand-logo {
