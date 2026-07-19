@@ -1317,6 +1317,14 @@ h3 {
   font-size: 17px;
 }
 
+.step-card h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
 .payment {
   background: #f5ecdf;
 }
