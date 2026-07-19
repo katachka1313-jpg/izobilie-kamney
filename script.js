@@ -86,7 +86,8 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
 
   const scrollToSlide = (index) => {
     const nextIndex = (index + slides.length) % slides.length;
-    slides[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    const left = slides[nextIndex].offsetLeft - track.offsetLeft;
+    track.scrollTo({ left, behavior: "smooth" });
     updateDots(nextIndex);
   };
 
@@ -110,7 +111,8 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
     window.requestAnimationFrame(() => updateDots(findClosestSlide()));
   }, { passive: true });
 
-  requestAnimationFrame(() => scrollToSlide(0));
+  track.scrollTo({ left: 0 });
+  updateDots(0);
 });
 
 const requestForm = document.querySelector("#request-form");
