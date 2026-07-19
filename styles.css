@@ -1830,6 +1830,64 @@ h3 {
   }
 }
 
+@media (min-width: 1024px) {
+  .examples {
+    padding-bottom: 64px;
+  }
+
+  .works-carousel {
+    margin-bottom: 28px;
+  }
+
+  .works-carousel-track {
+    align-items: stretch;
+    padding-bottom: 14px;
+  }
+
+  .works-carousel-track .work-card {
+    display: flex;
+    min-height: 640px;
+    height: auto;
+    flex-direction: column;
+  }
+
+  .work-card > img,
+  .work-carousel {
+    flex: 0 0 300px;
+    height: 300px;
+  }
+
+  .work-body {
+    flex: 1 1 auto;
+    padding: 24px 24px 22px;
+    gap: 9px;
+  }
+
+  .work-body h3 {
+    line-height: 1.25;
+  }
+
+  .work-body p,
+  .work-description {
+    line-height: 1.5;
+  }
+
+  .work-type {
+    line-height: 1.35;
+  }
+
+  .work-stones,
+  .work-body .work-spec {
+    line-height: 1.45;
+  }
+
+  .work-footer {
+    margin-top: auto;
+    gap: 13px;
+    padding-top: 10px;
+  }
+}
+
 @media (max-width: 1100px) {
   .stones-carousel-slide {
     flex-basis: calc((100% - var(--stones-carousel-gap)) / 2);
