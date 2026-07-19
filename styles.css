@@ -369,10 +369,19 @@ h3 {
 }
 
 .hero-text {
-  max-width: 520px;
+  max-width: 600px;
   margin: 16px 0 0;
   color: var(--muted);
-  font-size: clamp(17px, 1.5vw, 19px);
+  font-size: clamp(16px, 1.35vw, 18px);
+  line-height: 1.58;
+}
+
+.hero-text p {
+  margin: 0;
+}
+
+.hero-text p + p {
+  margin-top: 10px;
 }
 
 .hero-actions {
@@ -1873,7 +1882,7 @@ h3 {
     max-width: 100%;
     margin-right: 0;
     margin-left: 0;
-    min-height: 560px;
+    min-height: 620px;
     padding: 26px max(18px, env(safe-area-inset-left)) 34px max(18px, env(safe-area-inset-right));
     align-items: flex-start;
     background:
@@ -1913,7 +1922,12 @@ h3 {
 
   .hero-text {
     margin-top: 12px;
-    font-size: 16px;
+    font-size: 15.5px;
+    line-height: 1.5;
+  }
+
+  .hero-text p + p {
+    margin-top: 8px;
   }
 
   h2 {
