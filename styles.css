@@ -1293,15 +1293,15 @@ h3 {
 
 .step-list {
   display: grid;
-  gap: 10px;
+  gap: 16px;
 }
 
 .step-card {
   display: grid;
-  grid-template-columns: 72px 1fr;
-  align-items: center;
-  min-height: 72px;
-  padding: 14px 20px;
+  grid-template-columns: 64px 1fr;
+  align-items: start;
+  min-height: 0;
+  padding: 24px 26px;
 }
 
 .step-card span {
@@ -1314,7 +1314,12 @@ h3 {
 .step-card p {
   margin: 0;
   color: var(--muted);
-  font-size: 17px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.step-card p + p {
+  margin-top: 8px;
 }
 
 .step-card h3 {
@@ -2223,11 +2228,15 @@ h3 {
     min-height: 0;
   }
 
+  .step-list {
+    gap: 14px;
+  }
+
   .step-card {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 8px;
     min-height: 0;
-    padding: 16px 18px;
+    padding: 20px;
   }
 
   .request {
