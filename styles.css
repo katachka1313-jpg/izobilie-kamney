@@ -719,6 +719,12 @@ h3 {
   font-weight: 800;
 }
 
+.format-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
 .size-guide-card h3,
 .size-guide-card p {
   margin: 0;
