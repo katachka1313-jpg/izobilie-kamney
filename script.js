@@ -15,6 +15,31 @@ if (navToggle && mainNav) {
   });
 }
 
+const scrollToExamplesOnInitialLoad = () => {
+  if (window.location.hash) {
+    return;
+  }
+
+  const examplesSection = document.querySelector("#examples");
+
+  if (!examplesSection) {
+    return;
+  }
+
+  const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height || 0;
+  const targetTop = examplesSection.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
+  const shouldReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  window.scrollTo({
+    top: Math.max(targetTop, 0),
+    behavior: shouldReduceMotion ? "auto" : "smooth",
+  });
+};
+
+window.addEventListener("load", () => {
+  window.requestAnimationFrame(scrollToExamplesOnInitialLoad);
+});
+
 document.querySelectorAll("[data-carousel]").forEach((carousel) => {
   const images = Array.from(carousel.querySelectorAll("img"));
   const dots = Array.from(carousel.querySelectorAll(".carousel-dots span"));
