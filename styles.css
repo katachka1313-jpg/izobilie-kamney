@@ -1204,7 +1204,7 @@ h3 {
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 16px 18px 20px;
 }
 
@@ -1218,7 +1218,7 @@ h3 {
 .work-body p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .work-type {
@@ -1239,7 +1239,7 @@ h3 {
 .work-important {
   color: var(--ink);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .work-important {
@@ -1249,7 +1249,7 @@ h3 {
 
 .work-description {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .work-body strong {
@@ -1263,9 +1263,9 @@ h3 {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 8px;
   padding-bottom: 0;
 }
 
@@ -1926,7 +1926,7 @@ h3 {
 
   .works-carousel-track .work-card {
     display: flex;
-    min-height: 640px;
+    min-height: 600px;
     height: auto;
     flex-direction: column;
   }
@@ -1940,7 +1940,7 @@ h3 {
   .work-body {
     flex: 1 1 auto;
     padding: 24px 24px 22px;
-    gap: 9px;
+    gap: 8px;
   }
 
   .work-body h3 {
@@ -1949,7 +1949,7 @@ h3 {
 
   .work-body p,
   .work-description {
-    line-height: 1.5;
+    line-height: 1.42;
   }
 
   .work-type {
@@ -1957,14 +1957,15 @@ h3 {
   }
 
   .work-stones,
-  .work-body .work-spec {
-    line-height: 1.45;
+  .work-body .work-spec,
+  .work-important {
+    line-height: 1.4;
   }
 
   .work-footer {
     margin-top: auto;
-    gap: 13px;
-    padding-top: 10px;
+    gap: 10px;
+    padding-top: 8px;
   }
 }
 
@@ -2244,7 +2245,7 @@ h3 {
     height: auto;
     flex: 0 1 auto;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     padding: 20px;
     overflow: visible;
     overflow-wrap: break-word;
@@ -2255,7 +2256,7 @@ h3 {
   .work-body h3 {
     min-width: 0;
     min-height: 0;
-    margin: 0 0 8px;
+    margin: 0;
     font-size: 22px;
     line-height: 1.2;
     overflow-wrap: break-word;
@@ -2266,7 +2267,8 @@ h3 {
   .work-type,
   .work-stones,
   .work-description,
-  .work-body .work-spec {
+  .work-body .work-spec,
+  .work-important {
     display: block;
     min-width: 0;
     min-height: 0;
@@ -2289,7 +2291,7 @@ h3 {
     min-height: 0;
     flex-direction: column;
     gap: 12px;
-    margin-top: 14px;
+    margin-top: 10px;
     padding-top: 0;
     padding-bottom: 0;
   }
