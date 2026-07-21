@@ -187,3 +187,33 @@ if (cookieBanner && cookieAccept) {
     cookieBanner.hidden = true;
   });
 }
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if (!prefersReducedMotion) {
+  const revealItems = Array.from(document.querySelectorAll(
+    ".section:not(.hero), .option-card, .format-card, .stone-wide-note, .work-card, .examples-note, .memory-note, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card, .contact-card"
+  ));
+
+  revealItems.forEach((item, index) => {
+    item.classList.add("reveal-on-scroll");
+
+    if (item.matches(".option-card, .format-card, .work-card, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card")) {
+      item.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 55}ms`);
+    }
+  });
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: "0px 0px -40px 0px",
+  });
+
+  revealItems.forEach((item) => revealObserver.observe(item));
+}
