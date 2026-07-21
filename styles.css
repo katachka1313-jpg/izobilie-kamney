@@ -18,6 +18,7 @@
   --soft: #f7efe6;
   --line: rgba(184, 145, 73, 0.22);
   --shadow: 0 18px 44px rgba(88, 65, 42, 0.09);
+  --shadow-lift: 0 24px 54px rgba(88, 65, 42, 0.13);
   --section-gap: clamp(44px, 5.2vw, 72px);
 }
 
@@ -145,7 +146,7 @@ img {
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, border-color 220ms ease, color 220ms ease;
 }
 
 .header-button,
@@ -611,6 +612,7 @@ h3 {
   border-radius: 14px;
   background: rgba(255, 253, 248, 0.72);
   box-shadow: var(--shadow);
+  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease, background 260ms ease;
 }
 
 .option-card,
@@ -628,6 +630,20 @@ h3 {
   min-height: 158px;
   flex-direction: column;
   gap: 10px;
+}
+
+.option-card:hover,
+.work-card:hover,
+.stone-card:hover,
+.measure-card:hover,
+.payment-card:hover,
+.step-card:hover,
+.format-card:hover,
+.size-guide-card:hover,
+.care-card:hover {
+  border-color: rgba(184, 145, 73, 0.28);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-4px);
 }
 
 .option-card h3 {
@@ -1099,6 +1115,7 @@ h3 {
 
 .work-card > img {
   padding: 0;
+  transition: transform 420ms ease;
 }
 
 .work-carousel {
@@ -1112,7 +1129,23 @@ h3 {
   height: 100%;
   padding: 0;
   opacity: 0;
-  transition: opacity 180ms ease;
+  transition: opacity 220ms ease, transform 420ms ease;
+}
+
+.work-card:hover > img,
+.work-card:hover .work-carousel img.is-active {
+  transform: scale(1.02);
+}
+
+.carousel-button,
+.stones-carousel-button {
+  transition: transform 200ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+
+.carousel-button:hover,
+.stones-carousel-button:hover {
+  background: var(--cream);
+  box-shadow: 0 14px 28px rgba(88, 65, 42, 0.16);
 }
 
 .work-carousel img.is-active {
@@ -1202,10 +1235,16 @@ h3 {
   line-height: 1.45;
 }
 
-.work-body .work-spec {
+.work-body .work-spec,
+.work-important {
   color: var(--ink);
   font-size: 14px;
   line-height: 1.45;
+}
+
+.work-important {
+  border-left: 3px solid rgba(184, 145, 73, 0.28);
+  padding-left: 10px;
 }
 
 .work-description {
@@ -1715,6 +1754,55 @@ h3 {
 
 .legal-page .button {
   margin-top: 16px;
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 620ms ease, transform 620ms ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero .eyebrow,
+.hero h1,
+.hero-text,
+.hero-actions,
+.hero-audience {
+  animation: heroFadeUp 680ms ease both;
+}
+
+.hero h1 { animation-delay: 90ms; }
+.hero-text { animation-delay: 170ms; }
+.hero-actions { animation-delay: 250ms; }
+.hero-audience { animation-delay: 330ms; }
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 @media (max-width: 1120px) {
