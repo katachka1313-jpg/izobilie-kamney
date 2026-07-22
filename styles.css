@@ -64,10 +64,10 @@ img {
   z-index: 20;
   display: grid;
   width: 100%;
-  grid-template-columns: minmax(260px, auto) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(280px, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(10px, 1.6vw, 18px);
-  padding: 11px clamp(18px, 3.4vw, 44px);
+  padding: 8px clamp(18px, 3.4vw, 44px);
   background: rgba(251, 248, 241, 0.9);
   border-bottom: 1px solid rgba(184, 145, 73, 0.16);
   backdrop-filter: blur(18px);
@@ -93,13 +93,10 @@ img {
 }
 
 .brand-logo img {
-  width: clamp(56px, 4.8vw, 68px);
-  height: clamp(56px, 4.8vw, 68px);
-  aspect-ratio: 1 / 1;
-  flex: 0 0 clamp(56px, 4.8vw, 68px);
-  border-radius: 50%;
-  overflow: hidden;
-  background: #fff7ec;
+  width: auto;
+  height: clamp(64px, 5vw, 76px);
+  max-width: clamp(64px, 5vw, 76px);
+  flex: 0 0 auto;
   object-fit: contain;
   object-position: center center;
 }
@@ -512,48 +509,49 @@ h3 {
 
 .about-text {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
   align-items: center;
-  gap: 14px 24px;
+  gap: clamp(56px, 5vw, 72px);
   width: 100%;
-  max-width: 920px;
+  max-width: 1240px;
   margin: 0 auto;
   min-height: 0;
   border: 1px solid rgba(184, 145, 73, 0.16);
   border-radius: 22px;
-  padding: clamp(22px, 3.6vw, 34px);
+  padding: clamp(28px, 4vw, 48px);
   background:
     radial-gradient(circle at 92% 6%, rgba(234, 214, 168, 0.24), transparent 30%),
     linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(247, 239, 230, 0.74));
   box-shadow: 0 18px 44px rgba(88, 65, 42, 0.06);
   color: var(--muted);
-  font-size: clamp(17px, 1.7vw, 19px);
-  line-height: 1.58;
+  font-size: clamp(17px, 1.55vw, 19px);
+  line-height: 1.68;
 }
 
 .about-brand-logo {
-  grid-row: 1 / -1;
-  width: clamp(220px, 22vw, 280px);
-  height: clamp(220px, 22vw, 280px);
-  aspect-ratio: 1 / 1;
-  margin: 0;
-  border: 1px solid rgba(184, 145, 73, 0.14);
-  border-radius: 50%;
-  padding: 0;
-  overflow: hidden;
-  background: #fff7ec;
+  width: min(100%, 340px);
+  height: auto;
+  max-width: 340px;
+  margin: 0 auto;
   object-fit: contain;
   object-position: center center;
-  box-shadow: 0 14px 34px rgba(88, 65, 42, 0.08);
-  opacity: 0.92;
+  opacity: 0.96;
 }
 
-.about-text p:first-child {
-  margin-top: 0;
+.about-copy {
+  max-width: 780px;
+  min-width: 0;
 }
 
-.about-text p {
-  grid-column: 2;
+.about-copy h2 {
+  margin: 0 0 18px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1.16;
+}
+
+.about-copy p {
   min-width: 0;
   margin: 0;
   white-space: normal;
@@ -561,8 +559,8 @@ h3 {
   word-break: normal;
 }
 
-.about-text p:last-child {
-  margin-bottom: 0;
+.about-copy p + p {
+  margin-top: 16px;
 }
 
 .option-grid,
@@ -1818,9 +1816,8 @@ h3 {
   }
 
   .brand-logo img {
-    width: 56px;
-    height: 56px;
-    flex-basis: 56px;
+    height: 60px;
+    max-width: 60px;
   }
 
   .nav-toggle {
@@ -1854,7 +1851,8 @@ h3 {
   }
 
   .about-text {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+    gap: 40px;
     max-width: 100%;
     justify-self: stretch;
   }
@@ -1909,9 +1907,8 @@ h3 {
   }
 
   .brand-logo img {
-    width: 40px;
-    height: 40px;
-    flex-basis: 40px;
+    height: 52px;
+    max-width: 52px;
   }
 }
 
@@ -2013,9 +2010,8 @@ h3 {
   }
 
   .brand-logo img {
-    width: 52px;
-    height: 52px;
-    flex-basis: 52px;
+    height: 56px;
+    max-width: 56px;
   }
 
   .section {
@@ -2047,15 +2043,14 @@ h3 {
     font-size: 16px;
   }
 
-  .about-text p {
-    grid-column: 1;
+  .about-copy {
     width: 100%;
+    max-width: 680px;
   }
 
   .about-brand-logo {
-    grid-row: auto;
-    width: min(220px, 70vw);
-    height: min(220px, 70vw);
+    width: min(250px, 70vw);
+    max-width: 250px;
   }
 
   .hero {
@@ -2406,14 +2401,9 @@ h3 {
     padding: 18px;
   }
 
-  .about-text p {
-    grid-column: auto;
-  }
-
   .about-brand-logo {
-    grid-row: auto;
-    width: min(220px, 70vw);
-    height: min(220px, 70vw);
+    width: min(240px, 68vw);
+    max-width: 240px;
   }
 
   .cookie-banner {
@@ -2473,9 +2463,8 @@ h3 {
   }
 
   .brand-logo img {
-    width: 56px;
-    height: 56px;
-    flex-basis: 56px;
+    height: 64px;
+    max-width: 64px;
   }
 
   .main-nav {
