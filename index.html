@@ -692,12 +692,17 @@
             <input type="text" name="name" placeholder="Ваше имя" required>
           </label>
           <label class="form-field">
-            <span>Контакт для связи</span>
-            <input type="text" name="contact" placeholder="Телефон, Telegram или WhatsApp" required>
+            <span>Телефон для связи</span>
+            <input type="tel" name="phone" placeholder="+7(***) ***-**-**" inputmode="tel" autocomplete="tel" pattern="\+7\(\d{3}\) \d{3}-\d{2}-\d{2}" required>
+          </label>
+          <label class="form-field">
+            <span>Дополнительный контакт для связи</span>
+            <input type="text" name="additional_contact" placeholder="Например: Telegram, WhatsApp, MAX или удобное время для звонка" required>
           </label>
           <label class="form-field">
             <span>Что хотите заказать?</span>
-            <select name="jewelry">
+            <select name="jewelry" required>
+              <option value="" disabled selected>Выберите украшение</option>
               <option>Браслет</option>
               <option>Колье</option>
               <option>Серьги</option>
@@ -708,7 +713,8 @@
           </label>
           <label class="form-field">
             <span>Для кого украшение?</span>
-            <select name="recipient">
+            <select name="recipient" required>
+              <option value="" disabled selected>Выберите, для кого украшение</option>
               <option>Для себя</option>
               <option>В подарок</option>
               <option>Для ребёнка</option>
@@ -717,7 +723,8 @@
           </label>
           <label class="form-field">
             <span>Фурнитура</span>
-            <select name="furniture">
+            <select name="furniture" required>
+              <option value="" disabled selected>Выберите фурнитуру</option>
               <option>Не знаю, нужна помощь</option>
               <option>Позолота</option>
               <option>Родий</option>
@@ -725,19 +732,19 @@
           </label>
           <label class="form-field">
             <span>Дата рождения</span>
-            <input type="text" name="birthdate" placeholder="Дата рождения с годом, если нужен подбор по дате">
+            <input type="text" name="birthdate" placeholder="Дата рождения с годом, если нужен подбор по дате" required>
           </label>
           <label class="form-field form-field-wide">
             <span>Размер</span>
-            <input type="text" name="size" placeholder="Например: браслет 16 см, колье 45 см, серьги лёгкие или “нужна помощь”">
+            <input type="text" name="size" placeholder="Например: браслет 16 см, колье 45 см, серьги лёгкие или “нужна помощь”" required>
           </label>
           <label class="form-field form-field-wide">
             <span>Цвет / цветовая гамма</span>
-            <input type="text" name="color" placeholder="Например: нежные оттенки, розовый, синий, зелёный, золото, под образ или платье">
+            <input type="text" name="color" placeholder="Например: нежные оттенки, розовый, синий, зелёный, золото, под образ или платье" required>
           </label>
           <label class="form-field form-field-wide">
             <span>Пожелания</span>
-            <textarea name="message" rows="3" placeholder="Пожелания по цвету, цветовой гамме, камням, поводу, настроению или личному запросу"></textarea>
+            <textarea name="message" rows="3" placeholder="Пожелания по цвету, цветовой гамме, камням, поводу, настроению или личному запросу" required></textarea>
           </label>
         </div>
         <label class="form-consent">

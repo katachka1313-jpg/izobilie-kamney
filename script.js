@@ -142,14 +142,69 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
 
 const requestForm = document.querySelector("#request-form");
 const requestError = document.querySelector("#request-error");
+const phoneInput = requestForm?.querySelector('input[name="phone"]');
+
+const formatRussianPhone = (value) => {
+  const digits = value.replace(/\D/g, "");
+  const withoutCountryCode = digits.replace(/^8/, "").replace(/^7/, "").slice(0, 10);
+  const area = withoutCountryCode.slice(0, 3);
+  const first = withoutCountryCode.slice(3, 6);
+  const second = withoutCountryCode.slice(6, 8);
+  const third = withoutCountryCode.slice(8, 10);
+
+  let formatted = "+7";
+
+  if (area) {
+    formatted += `(${area}`;
+  }
+
+  if (area.length === 3) {
+    formatted += ")";
+  }
+
+  if (first) {
+    formatted += ` ${first}`;
+  }
+
+  if (second) {
+    formatted += `-${second}`;
+  }
+
+  if (third) {
+    formatted += `-${third}`;
+  }
+
+  return formatted;
+};
+
+if (phoneInput instanceof HTMLInputElement) {
+  phoneInput.addEventListener("input", () => {
+    phoneInput.value = formatRussianPhone(phoneInput.value);
+  });
+
+  phoneInput.addEventListener("focus", () => {
+    if (!phoneInput.value) {
+      phoneInput.value = "+7";
+    }
+  });
+}
 
 if (requestForm instanceof HTMLFormElement) {
   requestForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    if (!requestForm.checkValidity()) {
+      if (requestError) {
+        requestError.textContent = "Пожалуйста, заполните все обязательные поля.";
+      }
+      requestForm.reportValidity();
+      return;
+    }
+
     const formData = new FormData(requestForm);
     const name = String(formData.get("name") || "").trim();
-    const contact = String(formData.get("contact") || "").trim();
+    const phone = String(formData.get("phone") || "").trim();
+    const additionalContact = String(formData.get("additional_contact") || "").trim();
     const jewelry = String(formData.get("jewelry") || "").trim();
     const recipient = String(formData.get("recipient") || "").trim();
     const furniture = String(formData.get("furniture") || "").trim();
@@ -157,21 +212,6 @@ if (requestForm instanceof HTMLFormElement) {
     const size = String(formData.get("size") || "").trim();
     const color = String(formData.get("color") || "").trim();
     const message = String(formData.get("message") || "").trim();
-    const consent = formData.get("consent");
-
-    if (!name || !contact) {
-      if (requestError) {
-        requestError.textContent = "Пожалуйста, заполните имя и контакт для связи.";
-      }
-      return;
-    }
-
-    if (!consent) {
-      if (requestError) {
-        requestError.textContent = "Пожалуйста, подтвердите согласие на обработку персональных данных.";
-      }
-      return;
-    }
 
     if (requestError) {
       requestError.textContent = "";
@@ -181,15 +221,16 @@ if (requestForm instanceof HTMLFormElement) {
       "Новая заявка с сайта “Изобилие из камней”",
       "",
       `Имя: ${name}`,
-      `Контакт: ${contact}`,
+      `Телефон для связи: ${phone}`,
+      `Дополнительный контакт: ${additionalContact}`,
       `Что хочет заказать: ${jewelry}`,
       `Для кого: ${recipient}`,
-      `Размер: ${size || "не указан"}`,
-      `Фурнитура: ${furniture || "не указана"}`,
-      `Дата рождения: ${birthdate || "не указана"}`,
-      `Цвет / цветовая гамма: ${color || "не указана"}`,
-      `Пожелания: ${message || "не указаны"}`,
-    ].filter(Boolean);
+      `Фурнитура: ${furniture}`,
+      `Размер: ${size}`,
+      `Цвет/оттенки: ${color}`,
+      `Дата рождения: ${birthdate}`,
+      `Пожелания: ${message}`,
+    ];
 
     const telegramUrl = `https://t.me/OLESIA_CHUKOMINA?text=${encodeURIComponent(lines.join("\n"))}`;
     window.open(telegramUrl, "_blank", "noopener");
