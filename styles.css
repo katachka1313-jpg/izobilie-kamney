@@ -1118,6 +1118,11 @@ h3 {
   transition: transform 420ms ease;
 }
 
+.work-image--decorative-pins {
+  object-fit: contain;
+  object-position: center;
+}
+
 .work-carousel {
   position: relative;
 }
