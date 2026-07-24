@@ -1567,12 +1567,16 @@ h3 {
   text-underline-offset: 3px;
 }
 
-.form-error {
+.form-status {
   min-height: 18px;
   margin: 6px 0 0;
   color: #9a594d;
   font-size: 14px;
   font-weight: 700;
+}
+
+.form-status.is-success {
+  color: #4f7f52;
 }
 
 .form-actions {
