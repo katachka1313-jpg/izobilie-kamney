@@ -140,8 +140,12 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
   updateDots(0);
 });
 
+const FORM_ENDPOINT = "";
+// Telegram bot token and chat_id must be stored only in Cloudflare Worker or another server-side handler, not in frontend code.
+// After creating Cloudflare Worker, paste its public URL into FORM_ENDPOINT.
+
 const requestForm = document.querySelector("#request-form");
-const requestError = document.querySelector("#request-error");
+const requestStatus = document.querySelector("#request-status");
 const phoneInput = requestForm?.querySelector('input[name="phone"]');
 
 const formatRussianPhone = (value) => {
@@ -177,6 +181,34 @@ const formatRussianPhone = (value) => {
   return formatted;
 };
 
+const setRequestStatus = (message, type = "") => {
+  if (!requestStatus) {
+    return;
+  }
+
+  requestStatus.textContent = message;
+  requestStatus.classList.toggle("is-success", type === "success");
+};
+
+const buildRequestPayload = (form) => {
+  const formData = new FormData(form);
+
+  return {
+    name: String(formData.get("name") || "").trim(),
+    phone: String(formData.get("phone") || "").trim(),
+    contact: String(formData.get("additional_contact") || "").trim(),
+    productType: String(formData.get("jewelry") || "").trim(),
+    recipient: String(formData.get("recipient") || "").trim(),
+    hardware: String(formData.get("furniture") || "").trim(),
+    size: String(formData.get("size") || "").trim(),
+    colors: String(formData.get("color") || "").trim(),
+    birthDate: String(formData.get("birthdate") || "").trim(),
+    wishes: String(formData.get("message") || "").trim(),
+    page: window.location.href,
+    createdAt: new Date().toISOString(),
+  };
+};
+
 if (phoneInput instanceof HTMLInputElement) {
   phoneInput.addEventListener("input", () => {
     phoneInput.value = formatRussianPhone(phoneInput.value);
@@ -190,50 +222,53 @@ if (phoneInput instanceof HTMLInputElement) {
 }
 
 if (requestForm instanceof HTMLFormElement) {
-  requestForm.addEventListener("submit", (event) => {
+  requestForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (!requestForm.checkValidity()) {
-      if (requestError) {
-        requestError.textContent = "Пожалуйста, заполните все обязательные поля.";
-      }
+      setRequestStatus("Пожалуйста, заполните все обязательные поля.");
       requestForm.reportValidity();
       return;
     }
 
-    const formData = new FormData(requestForm);
-    const name = String(formData.get("name") || "").trim();
-    const phone = String(formData.get("phone") || "").trim();
-    const additionalContact = String(formData.get("additional_contact") || "").trim();
-    const jewelry = String(formData.get("jewelry") || "").trim();
-    const recipient = String(formData.get("recipient") || "").trim();
-    const furniture = String(formData.get("furniture") || "").trim();
-    const birthdate = String(formData.get("birthdate") || "").trim();
-    const size = String(formData.get("size") || "").trim();
-    const color = String(formData.get("color") || "").trim();
-    const message = String(formData.get("message") || "").trim();
-
-    if (requestError) {
-      requestError.textContent = "";
+    if (!FORM_ENDPOINT.trim()) {
+      setRequestStatus("Форма почти готова к отправке. Адрес обработчика ещё не подключён.");
+      console.warn("FORM_ENDPOINT is empty. Add the public Cloudflare Worker URL to enable order form submission.");
+      return;
     }
 
-    const lines = [
-      "Новая заявка с сайта “Изобилие из камней”",
-      "",
-      `Имя: ${name}`,
-      `Телефон для связи: ${phone}`,
-      `Дополнительный контакт: ${additionalContact}`,
-      `Что хочет заказать: ${jewelry}`,
-      `Для кого: ${recipient}`,
-      `Фурнитура: ${furniture}`,
-      `Размер: ${size}`,
-      `Цвет/оттенки: ${color}`,
-      `Дата рождения: ${birthdate}`,
-      `Пожелания: ${message}`,
-    ];
+    const submitButton = requestForm.querySelector('button[type="submit"]');
+    const payload = buildRequestPayload(requestForm);
 
-    const telegramUrl = `https://t.me/OLESIA_CHUKOMINA?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(telegramUrl, "_blank", "noopener");
+    setRequestStatus("Отправляю заявку…");
+
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
+    }
+
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Form submission failed with status ${response.status}`);
+      }
+
+      setRequestStatus("Спасибо! Заявка отправлена. Я свяжусь с вами в ближайшее время.", "success");
+      requestForm.reset();
+    } catch (error) {
+      console.error("Order form submission failed", error);
+      setRequestStatus("Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
+    } finally {
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = false;
+      }
+    }
   });
 }
 
