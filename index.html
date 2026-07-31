@@ -708,16 +708,12 @@
           <div class="form-field">
             <div class="form-label-row">
               <label for="additional-contact">Дополнительный контакт для связи</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-additional-contact" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-additional-contact" role="tooltip" hidden>Укажите дополнительный удобный способ связи и имя пользователя или номер телефона. Поле можно не заполнять, если достаточно основного номера.</span>
             </div>
-            <input id="additional-contact" type="text" name="additional_contact" placeholder="Telegram, WhatsApp или другой способ">
+            <input id="additional-contact" type="text" name="additional_contact" placeholder="Telegram или WhatsApp">
           </div>
           <div class="form-field">
             <div class="form-label-row">
               <label for="jewelry">Что хотите заказать?</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-jewelry" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-jewelry" role="tooltip" hidden>Выберите вид изделия. Детали можно будет дополнительно описать в поле “Пожелания”.</span>
             </div>
             <select id="jewelry" name="jewelry" required>
               <option value="" disabled selected>Выберите украшение</option>
@@ -728,19 +724,15 @@
           <div class="form-field">
             <div class="form-label-row">
               <label for="recipient">Для кого украшение?</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-recipient" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-recipient" role="tooltip" hidden>Выберите, создается украшение для вас или в подарок другому человеку.</span>
             </div>
             <select id="recipient" name="recipient" required>
-              <option value="" disabled selected>Выберите, для кого украшение</option>
+              <option value="" disabled selected>Выберите вариант</option>
               <option>Для себя</option><option>В подарок</option><option>Для ребёнка</option><option>Другое</option>
             </select>
           </div>
           <div class="form-field">
             <div class="form-label-row">
               <label for="furniture">Фурнитура</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-furniture" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-furniture" role="tooltip" hidden>Выберите предпочтительный цвет или вид фурнитуры. Если не уверены, можно выбрать вариант “Нужна помощь”.</span>
             </div>
             <select id="furniture" name="furniture" required>
               <option value="" disabled selected>Выберите фурнитуру</option>
@@ -750,34 +742,26 @@
           <div class="form-field">
             <div class="form-label-row">
               <label for="birthdate">Дата рождения</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-birthdate" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-birthdate" role="tooltip" hidden>Укажите дату рождения с годом, если хотите индивидуальный подбор натуральных камней по дате рождения.</span>
             </div>
             <input id="birthdate" type="text" name="birthdate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="size-input">Размер</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-size" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-size" role="tooltip" hidden>Укажите нужный размер изделия. Например: браслет 16 см, колье 45 см. Для серег можно написать пожелания по длине и весу. Если не знаете размер, напишите: “Нужна помощь”.</span>
             </div>
-            <input id="size-input" type="text" name="size" placeholder="Например: браслет 16 см" required>
+            <input id="size-input" type="text" name="size" placeholder="Размер в см" required>
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="color">Цвет / цветовая гамма</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-color" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-color" role="tooltip" hidden>Опишите желаемые цвета и оттенки. Можно указать цвет одежды, образа, металла или прикрепить пожелания словами: нежное, яркое, спокойное, золотистое, серебристое.</span>
             </div>
-            <input id="color" type="text" name="color" placeholder="Например: нежные или синие оттенки" required>
+            <input id="color" type="text" name="color" placeholder="Любимые оттенки" required>
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="message">Пожелания</label>
-              <button class="field-help" type="button" aria-label="Показать подсказку" aria-expanded="false" aria-describedby="help-message" data-tooltip-trigger>?</button>
-              <span class="field-tooltip" id="help-message" role="tooltip" hidden>Напишите, для себя или в подарок создается изделие, какие камни нравятся, какое настроение хочется передать и какие качества хочется подчеркнуть: внутреннюю силу, спокойствие, женственность, уверенность или другие.</span>
             </div>
-            <textarea id="message" name="message" rows="3" placeholder="Расскажите о пожеланиях к украшению" required></textarea>
+            <textarea id="message" name="message" rows="3" placeholder="Ваши пожелания" required></textarea>
           </div>
         </div>
         <label class="form-consent">
@@ -787,7 +771,6 @@
         <div class="form-status" id="request-status" aria-live="polite"></div>
         <div class="form-actions">
           <button class="button primary" type="submit">Отправить заявку</button>
-          <a class="button secondary" href="https://t.me/OLESIA_CHUKOMINA" target="_blank" rel="noopener">Написать мне</a>
         </div>
       </form>
     </section>
@@ -796,13 +779,20 @@
       <div>
         <p class="eyebrow">Контакты</p>
         <h2>Хотите украшение для себя или в подарок?</h2>
-        <p>Напишите мне в Telegram, чтобы уточнить наличие, подобрать камни или заказать украшение по индивидуальному запросу.</p>
-        <p>Подписывайтесь на канал в MAX — там новости, примеры украшений и обновления.</p>
+        <p>Оставьте заявку на сайте — я свяжусь с вами, помогу подобрать натуральные камни, размер, фурнитуру и отвечу на все вопросы.</p>
       </div>
       <div class="contact-actions">
-        <a class="button primary" href="https://t.me/OLESIA_CHUKOMINA" target="_blank" rel="noopener">Написать мне</a>
-        <a class="button secondary" href="https://t.me/Kamni_Olesia" target="_blank" rel="noopener">Перейти в канал</a>
-        <a class="button secondary" href="https://max.ru/channel_kamni_Olesia" target="_blank" rel="noopener">Канал в MAX</a>
+        <div class="contact-action-group">
+          <a class="button primary" href="https://t.me/OLESIA_CHUKOMINA" target="_blank" rel="noopener">Telegram</a>
+          <a class="button secondary" href="https://max.ru/channel_kamni_Olesia" target="_blank" rel="noopener">MAX</a>
+        </div>
+        <div class="contact-channel-group">
+          <h3>Наши каналы</h3>
+          <div class="contact-action-group">
+            <a class="button secondary" href="https://t.me/Kamni_Olesia" target="_blank" rel="noopener">Канал Telegram</a>
+            <a class="button secondary" href="https://max.ru/channel_kamni_Olesia" target="_blank" rel="noopener">Канал MAX</a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
