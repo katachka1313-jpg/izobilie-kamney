@@ -1696,6 +1696,11 @@ h3 {
   color: var(--gold);
 }
 
+.footer-links .footer-offer-link {
+  color: var(--ink);
+  font-weight: 700;
+}
+
 .cookie-banner {
   position: fixed;
   right: 18px;
@@ -1762,6 +1767,118 @@ h3 {
 
 .legal-page .button {
   margin-top: 16px;
+}
+
+.offer-page {
+  width: min(880px, calc(100% - 40px));
+  padding-top: clamp(32px, 6vw, 68px);
+}
+
+.offer-header {
+  margin-bottom: clamp(34px, 6vw, 58px);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: clamp(26px, 4vw, 40px);
+}
+
+.offer-page .offer-title {
+  margin: 0 0 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 6vw, 56px);
+  line-height: 1.08;
+  letter-spacing: 0.035em;
+}
+
+.offer-page .offer-subtitle {
+  max-width: 700px;
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(19px, 2.8vw, 25px);
+  line-height: 1.4;
+}
+
+.offer-page .offer-edition {
+  margin: 18px 0 0;
+  font-size: 15px;
+}
+
+.offer-section {
+  margin-top: clamp(30px, 5vw, 48px);
+  scroll-margin-top: 24px;
+}
+
+.offer-page .offer-section h2 {
+  margin: 0 0 16px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(23px, 3.5vw, 31px);
+  line-height: 1.25;
+}
+
+.offer-page .offer-section p,
+.offer-page .offer-section li {
+  color: var(--text);
+  font-size: clamp(16px, 1.8vw, 18px);
+  line-height: 1.75;
+}
+
+.offer-page .offer-section p {
+  margin: 0 0 14px;
+}
+
+.offer-page .offer-section ul {
+  margin: 10px 0 18px;
+  padding-left: 1.4em;
+}
+
+.offer-page .offer-section li + li {
+  margin-top: 6px;
+}
+
+.offer-page .offer-section a:not(.button) {
+  color: var(--caramel);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.offer-details {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(20px, 4vw, 30px);
+  background: rgba(255, 253, 248, 0.8);
+  box-shadow: var(--shadow);
+}
+
+.offer-details address {
+  font-style: normal;
+}
+
+.offer-actions {
+  margin-top: clamp(32px, 5vw, 48px);
+}
+
+@media (max-width: 520px) {
+  .offer-page {
+    width: min(100% - 28px, 880px);
+    padding-bottom: 44px;
+  }
+
+  .offer-page .logo {
+    white-space: normal;
+  }
+
+  .offer-page .offer-section h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .offer-page .offer-section ul {
+    padding-left: 1.2em;
+  }
+
+  .offer-actions .button {
+    width: 100%;
+    white-space: normal;
+  }
 }
 
 .reveal-on-scroll {
