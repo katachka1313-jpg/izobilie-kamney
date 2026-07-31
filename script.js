@@ -289,20 +289,85 @@ if (cookieBanner && cookieAccept) {
   });
 }
 
+const tooltipTriggers = Array.from(document.querySelectorAll("[data-tooltip-trigger]"));
+
+const closeTooltip = (trigger) => {
+  const tooltipId = trigger.getAttribute("aria-describedby");
+  const tooltip = tooltipId ? document.getElementById(tooltipId) : null;
+  trigger.setAttribute("aria-expanded", "false");
+  if (tooltip) tooltip.hidden = true;
+};
+
+const closeAllTooltips = (except = null) => {
+  tooltipTriggers.forEach((trigger) => {
+    if (trigger !== except) closeTooltip(trigger);
+  });
+};
+
+tooltipTriggers.forEach((trigger) => {
+  const tooltipId = trigger.getAttribute("aria-describedby");
+  const tooltip = tooltipId ? document.getElementById(tooltipId) : null;
+  if (!tooltip) return;
+
+  trigger.addEventListener("click", () => {
+    const willOpen = trigger.getAttribute("aria-expanded") !== "true";
+    closeAllTooltips(trigger);
+    trigger.setAttribute("aria-expanded", String(willOpen));
+    tooltip.hidden = !willOpen;
+
+    if (willOpen) {
+      tooltip.style.removeProperty("--tooltip-shift");
+      const rect = tooltip.getBoundingClientRect();
+      const viewportPadding = 16;
+      let shift = 0;
+      if (rect.right > window.innerWidth - viewportPadding) shift -= rect.right - window.innerWidth + viewportPadding;
+      if (rect.left + shift < viewportPadding) shift += viewportPadding - (rect.left + shift);
+      tooltip.style.setProperty("--tooltip-shift", `${shift}px`);
+    }
+  });
+
+  const labelRow = trigger.closest(".form-label-row");
+  let hoverTimer;
+  labelRow?.addEventListener("mouseenter", () => {
+    hoverTimer = window.setTimeout(() => {
+      if (trigger.getAttribute("aria-expanded") !== "true") trigger.click();
+    }, 180);
+  });
+  labelRow?.addEventListener("mouseleave", () => {
+    window.clearTimeout(hoverTimer);
+    closeTooltip(trigger);
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element) || !event.target.closest(".form-label-row")) closeAllTooltips();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    const openTrigger = tooltipTriggers.find((trigger) => trigger.getAttribute("aria-expanded") === "true");
+    closeAllTooltips();
+    openTrigger?.focus();
+  }
+});
+
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-if (!prefersReducedMotion) {
+if (!prefersReducedMotion && "IntersectionObserver" in window) {
   const revealItems = Array.from(document.querySelectorAll(
-    ".section:not(.hero), .option-card, .format-card, .stone-wide-note, .work-card, .examples-note, .memory-note, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card, .contact-card"
+    ".section:not(.hero), .option-card, .format-card, .stone-wide-note, .work-card, .examples-note, .memory-note, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card, .contact-card, .request-form, .form-field, .form-consent"
   ));
 
-  revealItems.forEach((item, index) => {
+  revealItems.forEach((item) => {
     item.classList.add("reveal-on-scroll");
 
     if (item.matches(".option-card, .format-card, .work-card, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card")) {
-      item.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 55}ms`);
+      const siblingIndex = Array.from(item.parentElement?.children || []).indexOf(item);
+      item.style.setProperty("--reveal-delay", `${Math.min(Math.max(siblingIndex, 0), 4) * 45}ms`);
     }
   });
+
+  document.documentElement.classList.add("animations-ready");
 
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
@@ -317,4 +382,7 @@ if (!prefersReducedMotion) {
   });
 
   revealItems.forEach((item) => revealObserver.observe(item));
+
+  // A safety net keeps content visible if observation is interrupted by a browser issue.
+  window.setTimeout(() => revealItems.forEach((item) => item.classList.add("is-visible")), 2500);
 }
