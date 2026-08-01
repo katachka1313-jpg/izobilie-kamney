@@ -686,7 +686,7 @@
         <div class="form-grid">
           <label class="form-field">
             <span>Имя <span class="required-mark" aria-hidden="true">*</span></span>
-            <input type="text" name="name" placeholder="Ваше имя" required>
+            <input type="text" name="name" maxlength="100" placeholder="Ваше имя" required>
           </label>
           <label class="form-field">
             <span>Телефон для связи <span class="required-mark" aria-hidden="true">*</span></span>
@@ -696,13 +696,13 @@
             <div class="form-label-row">
               <label for="additional-contact">Дополнительный контакт для связи <span class="required-mark" aria-hidden="true">*</span></label>
             </div>
-            <input id="additional-contact" type="text" name="additional_contact" placeholder="Telegram или WhatsApp" required>
+            <input id="additional-contact" type="text" name="additional_contact" placeholder="Telegram или MAX" maxlength="100" required>
           </div>
           <div class="form-field">
             <div class="form-label-row">
-              <label for="jewelry">Что хотите заказать? <span class="required-mark" aria-hidden="true">*</span></label>
+              <label for="order-jewelry">Что хотите заказать? <span class="required-mark" aria-hidden="true">*</span></label>
             </div>
-            <select id="jewelry" name="jewelry" required>
+            <select id="order-jewelry" name="jewelry" required>
               <option value="" disabled selected>Выберите украшение</option>
               <option>Браслет</option><option>Колье</option><option>Серьги</option><option>Комплект</option>
               <option>Украшение по дате рождения</option><option>Пока не знаю, нужна помощь с подбором</option>
@@ -730,25 +730,25 @@
             <div class="form-label-row">
               <label for="birthdate">Дата рождения</label>
             </div>
-            <input id="birthdate" type="text" name="birthdate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
+            <input id="birthdate" type="text" name="birthdate" maxlength="20" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="size-input">Размер <span class="required-mark" aria-hidden="true">*</span></label>
             </div>
-            <input id="size-input" type="text" name="size" placeholder="Размер в см" required>
+            <input id="size-input" type="text" name="size" maxlength="100" placeholder="Размер в см" required>
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="color">Цвет / цветовая гамма</label>
             </div>
-            <input id="color" type="text" name="color" placeholder="Любимые оттенки">
+            <input id="color" type="text" name="color" maxlength="200" placeholder="Любимые оттенки">
           </div>
           <div class="form-field form-field-wide">
             <div class="form-label-row">
               <label for="message">Пожелания</label>
             </div>
-            <textarea id="message" name="message" rows="3" placeholder="Ваши пожелания"></textarea>
+            <textarea id="message" name="message" rows="3" maxlength="1000" placeholder="Ваши пожелания"></textarea>
           </div>
         </div>
         <label class="form-consent">
@@ -801,6 +801,6 @@
     <button class="button primary" type="button" id="cookie-accept">Понятно</button>
   </div>
 
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>
