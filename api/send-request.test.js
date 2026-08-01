@@ -48,6 +48,34 @@ test("handler rejects an incomplete request before calling Telegram", async () =
   assert.deepEqual(response.payload, { ok: false, error: "Заполните все обязательные поля." });
 });
 
+test("handler rejects an invalid phone number", async () => {
+  const response = createResponse();
+  process.env.BOT_TOKEN = "test-token";
+  process.env.CHAT_ID = "test-chat";
+
+  await handler({
+    ...validRequest,
+    body: { ...validRequest.body, phone: "+7 999 123 45 67" },
+  }, response);
+
+  assert.equal(response.statusCode, 400);
+  assert.deepEqual(response.payload, { ok: false, error: "Проверьте формат номера телефона." });
+});
+
+test("handler rejects fields that would make the Telegram request too large", async () => {
+  const response = createResponse();
+  process.env.BOT_TOKEN = "test-token";
+  process.env.CHAT_ID = "test-chat";
+
+  await handler({
+    ...validRequest,
+    body: { ...validRequest.body, wishes: "а".repeat(1001) },
+  }, response);
+
+  assert.equal(response.statusCode, 400);
+  assert.deepEqual(response.payload, { ok: false, error: "Одно из полей заполнено слишком длинным текстом." });
+});
+
 test("handler sends the message using environment variables", async (context) => {
   const response = createResponse();
   process.env.BOT_TOKEN = "secret-token";

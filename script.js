@@ -250,14 +250,14 @@ if (requestForm instanceof HTMLFormElement) {
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok || !result.ok) {
-        throw new Error(result.error || `Form submission failed with status ${response.status}`);
+        throw new Error(result.error || "Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
       }
 
       setRequestStatus("Спасибо! Заявка отправлена. Я свяжусь с вами в ближайшее время.", "success");
       requestForm.reset();
     } catch (error) {
       console.error("Order form submission failed", error);
-      setRequestStatus("Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
+      setRequestStatus(error instanceof Error ? error.message : "Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
     } finally {
       if (submitButton instanceof HTMLButtonElement) {
         submitButton.disabled = false;

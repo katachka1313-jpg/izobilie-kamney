@@ -1,6 +1,19 @@
 const TELEGRAM_API_BASE_URL = "https://api.telegram.org";
 
 const REQUIRED_FIELDS = ["name", "phone", "contact", "productType", "hardware", "size"];
+const FIELD_LIMITS = {
+  name: 100,
+  phone: 30,
+  contact: 100,
+  productType: 100,
+  recipient: 100,
+  birthDate: 20,
+  hardware: 100,
+  size: 100,
+  colors: 200,
+  wishes: 1000,
+};
+const RUSSIAN_PHONE_PATTERN = /^\+7\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
 const escapeHtml = (value) => String(value || "")
   .replaceAll("&", "&amp;")
@@ -43,6 +56,17 @@ module.exports = async function handler(request, response) {
 
   if (hasMissingFields) {
     return response.status(400).json({ ok: false, error: "Заполните все обязательные поля." });
+  }
+
+  if (!RUSSIAN_PHONE_PATTERN.test(String(data.phone).trim())) {
+    return response.status(400).json({ ok: false, error: "Проверьте формат номера телефона." });
+  }
+
+  const hasOversizedField = Object.entries(FIELD_LIMITS)
+    .some(([field, limit]) => String(data[field] || "").trim().length > limit);
+
+  if (hasOversizedField) {
+    return response.status(400).json({ ok: false, error: "Одно из полей заполнено слишком длинным текстом." });
   }
 
   try {
