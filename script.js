@@ -140,9 +140,7 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
   updateDots(0);
 });
 
-const FORM_ENDPOINT = "";
-// Telegram bot token and chat_id must be stored only in Cloudflare Worker or another server-side handler, not in frontend code.
-// After creating Cloudflare Worker, paste its public URL into FORM_ENDPOINT.
+const FORM_ENDPOINT = "/api/send-request";
 
 const requestForm = document.querySelector("#request-form");
 const requestStatus = document.querySelector("#request-status");
@@ -231,12 +229,6 @@ if (requestForm instanceof HTMLFormElement) {
       return;
     }
 
-    if (!FORM_ENDPOINT.trim()) {
-      setRequestStatus("Форма почти готова к отправке. Адрес обработчика ещё не подключён.");
-      console.warn("FORM_ENDPOINT is empty. Add the public Cloudflare Worker URL to enable order form submission.");
-      return;
-    }
-
     const submitButton = requestForm.querySelector('button[type="submit"]');
     const payload = buildRequestPayload(requestForm);
 
@@ -255,8 +247,10 @@ if (requestForm instanceof HTMLFormElement) {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error(`Form submission failed with status ${response.status}`);
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || `Form submission failed with status ${response.status}`);
       }
 
       setRequestStatus("Спасибо! Заявка отправлена. Я свяжусь с вами в ближайшее время.", "success");
