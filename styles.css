@@ -19,7 +19,7 @@
   --line: rgba(184, 145, 73, 0.22);
   --shadow: 0 18px 44px rgba(88, 65, 42, 0.09);
   --shadow-lift: 0 24px 54px rgba(88, 65, 42, 0.13);
-  --section-gap: clamp(44px, 5.2vw, 72px);
+  --section-gap: clamp(40px, 4.6vw, 60px);
 }
 
 *,
@@ -458,9 +458,21 @@ h3 {
 }
 
 .section-heading p:not(.eyebrow) {
-  margin: 12px 0 0;
+  margin: 9px 0 0;
   color: var(--muted);
   font-size: clamp(17px, 2vw, 19px);
+  line-height: 1.5;
+}
+
+.section-heading .catalog-current {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.catalog-current a {
+  color: var(--ink);
+  font-weight: 700;
+  text-underline-offset: 3px;
 }
 
 .brand-crystal {
@@ -503,8 +515,8 @@ h3 {
   display: flex;
   justify-content: center;
   border-top: 1px solid rgba(184, 145, 73, 0.16);
-  padding-top: clamp(48px, 5.5vw, 72px);
-  padding-bottom: clamp(48px, 5.5vw, 72px);
+  padding-top: clamp(40px, 4.6vw, 60px);
+  padding-bottom: clamp(40px, 4.6vw, 60px);
 }
 
 .about-text {
@@ -525,7 +537,7 @@ h3 {
   box-shadow: 0 18px 44px rgba(88, 65, 42, 0.06);
   color: var(--muted);
   font-size: clamp(17px, 1.55vw, 19px);
-  line-height: 1.68;
+  line-height: 1.55;
 }
 
 .about-brand-logo {
@@ -544,7 +556,7 @@ h3 {
 }
 
 .about-copy h2 {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(26px, 3vw, 40px);
@@ -560,7 +572,7 @@ h3 {
 }
 
 .about-copy p + p {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .option-grid,
@@ -572,7 +584,7 @@ h3 {
 .size-guide-grid,
 .care-grid {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .option-grid,
@@ -620,14 +632,14 @@ h3 {
 .format-card,
 .size-guide-card,
 .care-card {
-  padding: 20px;
+  padding: 18px;
 }
 
 .option-card {
   display: flex;
   min-height: 158px;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .option-card:hover,
@@ -737,7 +749,7 @@ h3 {
 .format-actions {
   display: flex;
   justify-content: center;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 .size-guide-card h3,
@@ -753,7 +765,7 @@ h3 {
 
 .option-mark {
   display: inline-block;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--gold);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 22px;
@@ -1343,7 +1355,7 @@ h3 {
 
 .step-list {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .step-card {
@@ -1351,7 +1363,7 @@ h3 {
   grid-template-columns: 64px 1fr;
   align-items: start;
   min-height: 0;
-  padding: 24px 26px;
+  padding: 20px 22px;
 }
 
 .step-card span {
@@ -1476,9 +1488,9 @@ h3 {
 
 .request .section-heading p:not(.eyebrow) {
   max-width: 470px;
-  margin-top: 16px;
+  margin-top: 12px;
   font-size: 20px;
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 .request-form {
@@ -1493,6 +1505,18 @@ h3 {
     0 24px 62px rgba(88, 65, 42, 0.16),
     0 0 0 1px rgba(255, 255, 255, 0.62) inset;
   backdrop-filter: blur(10px);
+}
+
+.form-required-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.required-mark,
+.form-required-note span {
+  color: #9a594d;
 }
 
 .form-grid {
@@ -1610,8 +1634,8 @@ h3 {
   align-items: center;
   gap: 22px;
   border-top: 1px solid rgba(184, 145, 73, 0.16);
-  padding-top: clamp(40px, 5vw, 60px);
-  padding-bottom: clamp(40px, 5vw, 60px);
+  padding-top: clamp(34px, 4vw, 48px);
+  padding-bottom: clamp(34px, 4vw, 48px);
 }
 
 .contacts p {
@@ -1630,6 +1654,10 @@ h3 {
   display: grid;
   gap: 12px;
   min-width: min(100%, 430px);
+}
+
+.contact-max-button {
+  width: 100%;
 }
 
 .contact-action-group {
@@ -1725,10 +1753,6 @@ h3 {
   color: var(--gold);
 }
 
-.footer-links .footer-offer-link {
-  color: var(--ink);
-  font-weight: 700;
-}
 
 .cookie-banner {
   position: fixed;
@@ -2138,7 +2162,7 @@ h3 {
 
 @media (max-width: 680px) {
   :root {
-    --section-gap: 52px;
+    --section-gap: 42px;
   }
 
   .site-header {
@@ -2171,7 +2195,6 @@ h3 {
   .stone-note,
   .birth-date,
   .payment,
-  .price-factors,
   .stone-values,
   .care {
     padding-right: 14px;
@@ -2181,8 +2204,8 @@ h3 {
 
   .about {
     gap: 24px;
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: 40px;
+    padding-bottom: 40px;
   }
 
   .about-text {
