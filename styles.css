@@ -1937,14 +1937,16 @@ h3 {
 
 .animations-ready .reveal-on-scroll {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 620ms ease, transform 620ms ease;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 700ms ease-out, transform 700ms ease-out;
   transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
 
 .animations-ready .reveal-on-scroll.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
 }
 
 .hero .eyebrow,
