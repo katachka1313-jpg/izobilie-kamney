@@ -283,38 +283,85 @@ if (cookieBanner && cookieAccept) {
   });
 }
 
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-if (!prefersReducedMotion && "IntersectionObserver" in window) {
-  const revealItems = Array.from(document.querySelectorAll(
-    ".section:not(.hero), .option-card, .format-card, .stone-wide-note, .work-card, .examples-note, .memory-note, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card, .contact-card, .request-form, .form-field, .form-consent"
-  ));
+if (!reducedMotionQuery.matches && "IntersectionObserver" in window) {
+  const revealSelector = [
+    ".section-heading",
+    ".about-brand-logo",
+    ".about-copy",
+    ".option-card",
+    ".format-card",
+    ".format-actions",
+    ".stones-carousel",
+    ".stone-wide-note",
+    ".soft-note",
+    ".work-card",
+    ".examples-note",
+    ".memory-note",
+    ".measure-card",
+    ".size-guide-card",
+    ".care-card",
+    ".step-card",
+    ".order-wish",
+    ".request-form",
+    ".contacts > div",
+  ].join(", ");
+  const staggeredSelector = [
+    ".option-card",
+    ".format-card",
+    ".work-card",
+    ".measure-card",
+    ".size-guide-card",
+    ".care-card",
+    ".step-card",
+  ].join(", ");
+  const revealItems = Array.from(document.querySelectorAll(revealSelector));
+  const groupPositions = new Map();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 
   revealItems.forEach((item) => {
-    item.classList.add("reveal-on-scroll");
+    // Keep everything already on the first screen visible without a flash or delay.
+    const bounds = item.getBoundingClientRect();
+    if (bounds.top >= viewportHeight || bounds.bottom <= 0) {
+      item.classList.add("reveal-on-scroll");
+    }
 
-    if (item.matches(".option-card, .format-card, .work-card, .measure-card, .size-guide-card, .care-card, .step-card, .payment-card")) {
-      const siblingIndex = Array.from(item.parentElement?.children || []).indexOf(item);
-      item.style.setProperty("--reveal-delay", `${Math.min(Math.max(siblingIndex, 0), 4) * 45}ms`);
+    if (item.matches(staggeredSelector) && item.parentElement) {
+      const position = groupPositions.get(item.parentElement) || 0;
+      item.style.setProperty("--reveal-delay", `${Math.min(position, 5) * 50}ms`);
+      groupPositions.set(item.parentElement, position + 1);
     }
   });
 
+  // Until this class is added, CSS leaves all content visible (including without JS).
   document.documentElement.classList.add("animations-ready");
 
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
+      if (!entry.isIntersecting) {
+        return;
       }
+
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+
+      // Remove the animation helpers afterwards so they cannot override hover effects.
+      const finishReveal = () => {
+        entry.target.classList.remove("reveal-on-scroll", "is-visible");
+        entry.target.style.removeProperty("--reveal-delay");
+      };
+      entry.target.addEventListener("transitionend", finishReveal, { once: true });
+      window.setTimeout(finishReveal, 1100);
     });
   }, {
-    threshold: 0.12,
-    rootMargin: "0px 0px -40px 0px",
+    threshold: 0.01,
+    rootMargin: "0px 0px -8% 0px",
   });
 
-  revealItems.forEach((item) => revealObserver.observe(item));
-
-  // A safety net keeps content visible if observation is interrupted by a browser issue.
-  window.setTimeout(() => revealItems.forEach((item) => item.classList.add("is-visible")), 2500);
+  revealItems.forEach((item) => {
+    if (item.classList.contains("reveal-on-scroll")) {
+      revealObserver.observe(item);
+    }
+  });
 }
