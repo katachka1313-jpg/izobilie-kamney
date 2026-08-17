@@ -1290,6 +1290,13 @@ h3 {
 }
 
 .work-price {
+  position: relative;
+  z-index: 1;
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  opacity: 1;
+  visibility: visible;
   color: var(--caramel) !important;
   font-size: 18px;
   line-height: 1.3;
