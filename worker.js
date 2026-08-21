@@ -1,9 +1,10 @@
 const TELEGRAM_API_BASE_URL = "https://api.telegram.org";
 const MAX_API_BASE_URL = "https://platform-api.max.ru";
 
-// Origin GitHub Pages. If the repository is moved to another account,
-// replace this value with the new origin (without a trailing slash).
-const ALLOWED_ORIGIN = "https://katachka1313-jpg.github.io";
+const ALLOWED_ORIGINS = new Set([
+  "https://izobiliekamney.ru",
+  "https://www.izobiliekamney.ru",
+]);
 
 const REQUIRED_FIELDS = ["name", "phone", "contact", "productType", "hardware", "size"];
 const FIELD_LIMITS = {
@@ -19,28 +20,66 @@ const FIELD_LIMITS = {
   wishes: 1000,
 };
 const RUSSIAN_PHONE_PATTERN = /^\+7\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+const BIRTH_DATE_PATTERN = /^(\d{2})\.(\d{2})\.(\d{4})$/;
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Max-Age": "86400",
-  Vary: "Origin",
+const getCorsHeaders = (request) => {
+  const origin = request.headers.get("Origin");
+
+  return {
+    ...(ALLOWED_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
 };
 
-const jsonResponse = (payload, status = 200, additionalHeaders = {}) => new Response(
+const jsonResponse = (request, payload, status = 200, additionalHeaders = {}) => new Response(
   JSON.stringify(payload),
   {
     status,
     headers: {
       "Content-Type": "application/json; charset=UTF-8",
-      ...corsHeaders,
+      ...getCorsHeaders(request),
       ...additionalHeaders,
     },
   },
 );
 
-const errorResponse = (error, status) => jsonResponse({ success: false, error }, status);
+const errorResponse = (request, error, status) => jsonResponse(request, { success: false, error }, status);
+
+const normalizeBirthDate = (value) => {
+  const trimmedValue = String(value || "").trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  const digits = trimmedValue.replace(/\D/g, "");
+
+  return digits.length === 8
+    ? `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+    : trimmedValue;
+};
+
+const isValidBirthDate = (value) => {
+  if (!value) {
+    return true;
+  }
+
+  const match = BIRTH_DATE_PATTERN.exec(value);
+
+  if (!match) {
+    return false;
+  }
+
+  const [, day, month, year] = match;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return date.getUTCFullYear() === Number(year)
+    && date.getUTCMonth() === Number(month) - 1
+    && date.getUTCDate() === Number(day);
+};
 
 const escapeHtml = (value) => String(value || "")
   .replaceAll("&", "&amp;")
@@ -149,28 +188,34 @@ const handlePost = async (request, env) => {
   try {
     data = await request.json();
   } catch {
-    return errorResponse("Тело запроса должно содержать корректный JSON.", 400);
+    return errorResponse(request, "Тело запроса должно содержать корректный JSON.", 400);
   }
 
   if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return errorResponse("Тело запроса должно быть JSON-объектом.", 400);
+    return errorResponse(request, "Тело запроса должно быть JSON-объектом.", 400);
   }
+
+  data.birthDate = normalizeBirthDate(data.birthDate);
 
   const hasMissingFields = REQUIRED_FIELDS.some((field) => !String(data[field] || "").trim());
 
   if (hasMissingFields) {
-    return errorResponse("Заполните все обязательные поля.", 400);
+    return errorResponse(request, "Заполните все обязательные поля.", 400);
   }
 
   if (!RUSSIAN_PHONE_PATTERN.test(String(data.phone).trim())) {
-    return errorResponse("Проверьте формат номера телефона.", 400);
+    return errorResponse(request, "Проверьте формат номера телефона.", 400);
+  }
+
+  if (!isValidBirthDate(data.birthDate)) {
+    return errorResponse(request, "Проверьте дату рождения.", 400);
   }
 
   const hasOversizedField = Object.entries(FIELD_LIMITS)
     .some(([field, limit]) => String(data[field] || "").trim().length > limit);
 
   if (hasOversizedField) {
-    return errorResponse("Одно из полей заполнено слишком длинным текстом.", 400);
+    return errorResponse(request, "Одно из полей заполнено слишком длинным текстом.", 400);
   }
 
   const [telegramSent, maxSent] = await Promise.all([
@@ -179,20 +224,34 @@ const handlePost = async (request, env) => {
   ]);
 
   if (telegramSent || maxSent) {
-    return jsonResponse({ success: true });
+    return jsonResponse(request, { success: true });
   }
 
-  return errorResponse("Не удалось отправить заявку. Попробуйте ещё раз.", 502);
+  return errorResponse(request, "Не удалось отправить заявку. Попробуйте ещё раз.", 502);
 };
 
 export default {
   async fetch(request, env) {
+    const origin = request.headers.get("Origin");
+
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return errorResponse(request, "Origin не разрешён.", 403);
+    }
+
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders });
+      if (!origin) {
+        return errorResponse(request, "Origin не разрешён.", 403);
+      }
+
+      return new Response(null, { status: 204, headers: getCorsHeaders(request) });
     }
 
     if (request.method !== "POST") {
-      return errorResponse("Метод не поддерживается.", 405);
+      return errorResponse(request, "Метод не поддерживается.", 405);
+    }
+
+    if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) {
+      return errorResponse(request, "Content-Type должен быть application/json.", 415);
     }
 
     return handlePost(request, env);
