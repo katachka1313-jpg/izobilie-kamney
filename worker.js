@@ -227,9 +227,11 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    const { pathname } = new URL(request.url);
+    const url = new URL(request.url);
 
-    if (request.method === "GET" && pathname === "/max-chat-id") {
+    // This temporary diagnostic route must be handled before the form's
+    // POST-only method guard below.
+    if (request.method === "GET" && url.pathname === "/max-chat-id") {
       return handleMaxChatId(env);
     }
 
