@@ -134,7 +134,7 @@ const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
   "",
   `<b>Имя:</b> ${displayValue(data.name)}`,
-  `<b>Телефон:</b> <a href="${phoneHref(data.phone)}">${displayValue(data.phone)}</a>`,
+  `<b>Телефон:</b> ${displayValue(data.phone)} — <a href="${phoneHref(data.phone)}">📞 Позвонить</a>`,
   `<b>Удобный способ связи:</b> ${displayValue(CONTACT_METHODS[data.contactMethod])}`,
   ...telegramContactLine(data),
   ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${safeWebUrl(data.max) ? `<a href="${escapeHtml(safeWebUrl(data.max))}">${displayValue(data.max)}</a>` : displayValue(data.max)}`] : []),

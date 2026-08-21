@@ -80,7 +80,10 @@ test("POST normalizes a compact birth date before sending to Telegram", async (t
 
   assert.equal(response.status, 200);
   assert.match(telegramMessage, /Дата рождения:<\/b> 05\.01\.1993/);
-  assert.match(telegramMessage, /href="tel:\+79991234567"/);
+  assert.match(
+    telegramMessage,
+    /<b>Телефон:<\/b> \+7 \(999\) 123-45-67 — <a href="tel:\+79991234567">📞 Позвонить<\/a>/,
+  );
   assert.match(telegramMessage, /href="https:\/\/t\.me\/olesia"/);
   assert.equal(fetchMock.mock.callCount(), 1);
 });
