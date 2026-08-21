@@ -21,7 +21,7 @@ const FIELD_LIMITS = {
   colors: 200,
   wishes: 1000,
 };
-const RUSSIAN_PHONE_PATTERN = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+const RUSSIAN_PHONE_PATTERN = /^\+7\d{10}$/;
 const CONTACT_METHODS = { telegram: "Telegram", max: "MAX", phone: "По телефону" };
 const BIRTH_DATE_PATTERN = /^(\d{2})\.(\d{2})\.(\d{4})$/;
 
@@ -92,7 +92,11 @@ const escapeHtml = (value) => String(value || "")
 const displayValue = (value) => escapeHtml(String(value || "").trim() || "Не указано");
 const displayTextValue = (value) => String(value || "").trim() || "Не указано";
 
-const phoneHref = (phone) => `tel:${String(phone || "").replace(/\D/g, "").replace(/^7/, "+7")}`;
+const normalizeRussianPhone = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  const nationalNumber = digits.length === 11 && /^[78]/.test(digits) ? digits.slice(1) : digits;
+  return nationalNumber.length === 10 ? `+7${nationalNumber}` : "";
+};
 
 const telegramProfileUrl = (contact) => {
   const value = String(contact || "").trim();
@@ -108,15 +112,6 @@ const telegramProfileUrl = (contact) => {
   }
 };
 
-const safeWebUrl = (value) => {
-  try {
-    const url = new URL(String(value || "").trim());
-    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
-  } catch {
-    return "";
-  }
-};
-
 const telegramContactLine = (data) => {
   if (data.contactMethod !== "telegram") return [];
   const url = telegramProfileUrl(data.telegram);
@@ -124,20 +119,18 @@ const telegramContactLine = (data) => {
   return [`<b>Telegram:</b> ${url ? `<a href="${escapeHtml(url)}">${contact}</a>` : contact}`];
 };
 
-const maxContactLine = (data) => {
-  if (data.contactMethod !== "max") return [];
-  const url = safeWebUrl(data.max);
-  return [`MAX: ${url || displayTextValue(data.max)}`];
-};
+const maxContactLine = (data) => data.contactMethod === "max"
+  ? [`MAX: ${displayTextValue(data.max)}`]
+  : [];
 
 const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
   "",
   `<b>Имя:</b> ${displayValue(data.name)}`,
-  `<b>Телефон:</b> ${displayValue(data.phone)} — <a href="${phoneHref(data.phone)}">📞 Позвонить</a>`,
+  `<b>Телефон:</b> ${displayValue(normalizeRussianPhone(data.phone))}`,
   `<b>Удобный способ связи:</b> ${displayValue(CONTACT_METHODS[data.contactMethod])}`,
   ...telegramContactLine(data),
-  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${safeWebUrl(data.max) ? `<a href="${escapeHtml(safeWebUrl(data.max))}">${displayValue(data.max)}</a>` : displayValue(data.max)}`] : []),
+  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${displayValue(data.max)}`] : []),
   `<b>Что хочет заказать:</b> ${displayValue(data.productType)}`,
   `<b>Для кого:</b> ${displayValue(data.recipient)}`,
   `<b>Дата рождения:</b> ${displayValue(data.birthDate)}`,
@@ -151,7 +144,7 @@ const buildMaxMessage = (data) => [
   "💎 Новая заявка",
   "",
   `Имя: ${displayTextValue(data.name)}`,
-  `Телефон: [${displayTextValue(data.phone)}](${phoneHref(data.phone)})`,
+  `Телефон: ${displayTextValue(normalizeRussianPhone(data.phone))}`,
   `Удобный способ связи: ${displayTextValue(CONTACT_METHODS[data.contactMethod])}`,
   ...(data.contactMethod === "telegram" ? [`Telegram: ${telegramProfileUrl(data.telegram) || displayTextValue(data.telegram)}`] : []),
   ...maxContactLine(data),
@@ -247,6 +240,8 @@ const handlePost = async (request, env) => {
   if (hasMissingFields) {
     return errorResponse(request, "Заполните все обязательные поля.", 400);
   }
+
+  data.phone = normalizeRussianPhone(data.phone);
 
   if (!CONTACT_METHODS[data.contactMethod]
     || (data.contactMethod === "telegram" && !String(data.telegram || "").trim())

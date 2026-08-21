@@ -1602,6 +1602,7 @@ h3 {
 .form-field input,
 .form-field select,
 .form-field textarea {
+  box-sizing: border-box;
   width: 100%;
   border: 1px solid rgba(184, 145, 73, 0.2);
   border-radius: 8px;
@@ -1612,6 +1613,13 @@ h3 {
   line-height: 1.35;
   outline: none;
   transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.form-field input,
+.form-field select {
+  height: 44px;
+  padding: 9px 13px;
+  line-height: 1.35;
 }
 
 .form-field textarea {
