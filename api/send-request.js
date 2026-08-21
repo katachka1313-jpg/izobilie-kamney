@@ -38,6 +38,14 @@ const telegramProfileUrl = (contact) => {
     return url.protocol === "https:" && url.hostname.toLowerCase() === "t.me" ? url.toString() : "";
   } catch { return ""; }
 };
+const maxProfileUrl = (contact) => {
+  try {
+    const url = new URL(String(contact || "").trim());
+    return url.protocol === "https:" && ["max.ru", "www.max.ru"].includes(url.hostname.toLowerCase())
+      ? url.toString()
+      : "";
+  } catch { return ""; }
+};
 const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
   "",
@@ -45,7 +53,7 @@ const buildTelegramMessage = (data) => [
   `<b>Телефон:</b> ${displayValue(normalizeRussianPhone(data.phone))}`,
   `<b>Удобный способ связи:</b> ${displayValue(CONTACT_METHODS[data.contactMethod])}`,
   ...(data.contactMethod === "telegram" ? [`<b>Telegram:</b> ${telegramProfileUrl(data.telegram) ? `<a href="${escapeHtml(telegramProfileUrl(data.telegram))}">${displayValue(data.telegram)}</a>` : displayValue(data.telegram)}`] : []),
-  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${displayValue(data.max)}`] : []),
+  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${maxProfileUrl(data.max) ? `<a href="${escapeHtml(maxProfileUrl(data.max))}">${displayValue(data.max)}</a>` : displayValue(data.max)}`] : []),
   `<b>Что хочет заказать:</b> ${displayValue(data.productType)}`,
   `<b>Для кого:</b> ${displayValue(data.recipient)}`,
   `<b>Дата рождения:</b> ${displayValue(data.birthDate)}`,
