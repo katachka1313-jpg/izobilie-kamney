@@ -68,8 +68,9 @@ test("POST normalizes a compact birth date before sending to Telegram", async (t
     },
     body: JSON.stringify({
       name: "Олеся",
-      phone: "+7(999) 123-45-67",
-      contact: "@olesia",
+      phone: "+7 (999) 123-45-67",
+      contactMethod: "telegram",
+      telegram: "@olesia",
       productType: "Браслет",
       hardware: "Позолота",
       size: "17 см",
@@ -79,7 +80,23 @@ test("POST normalizes a compact birth date before sending to Telegram", async (t
 
   assert.equal(response.status, 200);
   assert.match(telegramMessage, /Дата рождения:<\/b> 05\.01\.1993/);
+  assert.match(telegramMessage, /href="tel:\+79991234567"/);
+  assert.match(telegramMessage, /href="https:\/\/t\.me\/olesia"/);
   assert.equal(fetchMock.mock.callCount(), 1);
+});
+
+test("POST requires the conditional contact", async () => {
+  const response = await context.worker.fetch(new Request(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: "Олеся", phone: "+7 (999) 123-45-67", contactMethod: "max",
+      productType: "Браслет", hardware: "Позолота", size: "17 см",
+    }),
+  }), {});
+
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { success: false, error: "Укажите способ связи и контакт для выбранного способа." });
 });
 
 test("POST rejects an impossible birth date", async () => {
@@ -91,8 +108,9 @@ test("POST rejects an impossible birth date", async () => {
     },
     body: JSON.stringify({
       name: "Олеся",
-      phone: "+7(999) 123-45-67",
-      contact: "@olesia",
+      phone: "+7 (999) 123-45-67",
+      contactMethod: "telegram",
+      telegram: "@olesia",
       productType: "Браслет",
       hardware: "Позолота",
       size: "17 см",

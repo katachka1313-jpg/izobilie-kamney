@@ -1569,6 +1569,10 @@ h3 {
   grid-column: 1 / -1;
 }
 
+.conditional-contact[hidden] {
+  display: none;
+}
+
 .form-field > span,
 .form-label-row label {
   color: var(--ink);
