@@ -229,8 +229,8 @@ export default {
 
     const url = new URL(request.url);
 
-    // This temporary diagnostic route must be handled before the form's
-    // POST-only method guard below.
+    // GET /max-chat-id is the temporary diagnostic route for discovering MAX chat IDs.
+    // It must be handled before the form's POST-only method guard below.
     if (request.method === "GET" && url.pathname === "/max-chat-id") {
       return handleMaxChatId(env);
     }
