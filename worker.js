@@ -112,16 +112,23 @@ const telegramProfileUrl = (contact) => {
   }
 };
 
+const maxProfileUrl = (contact) => {
+  try {
+    const url = new URL(String(contact || "").trim());
+    return url.protocol === "https:" && ["max.ru", "www.max.ru"].includes(url.hostname.toLowerCase())
+      ? url.toString()
+      : "";
+  } catch {
+    return "";
+  }
+};
+
 const telegramContactLine = (data) => {
   if (data.contactMethod !== "telegram") return [];
   const url = telegramProfileUrl(data.telegram);
   const contact = displayValue(data.telegram);
   return [`<b>Telegram:</b> ${url ? `<a href="${escapeHtml(url)}">${contact}</a>` : contact}`];
 };
-
-const maxContactLine = (data) => data.contactMethod === "max"
-  ? [`MAX: ${displayTextValue(data.max)}`]
-  : [];
 
 const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
@@ -130,7 +137,7 @@ const buildTelegramMessage = (data) => [
   `<b>Телефон:</b> ${displayValue(normalizeRussianPhone(data.phone))}`,
   `<b>Удобный способ связи:</b> ${displayValue(CONTACT_METHODS[data.contactMethod])}`,
   ...telegramContactLine(data),
-  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${displayValue(data.max)}`] : []),
+  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${maxProfileUrl(data.max) ? `<a href="${escapeHtml(maxProfileUrl(data.max))}">${displayValue(data.max)}</a>` : displayValue(data.max)}`] : []),
   `<b>Что хочет заказать:</b> ${displayValue(data.productType)}`,
   `<b>Для кого:</b> ${displayValue(data.recipient)}`,
   `<b>Дата рождения:</b> ${displayValue(data.birthDate)}`,
@@ -147,7 +154,7 @@ const buildMaxMessage = (data) => [
   `Телефон: ${displayTextValue(normalizeRussianPhone(data.phone))}`,
   `Удобный способ связи: ${displayTextValue(CONTACT_METHODS[data.contactMethod])}`,
   ...(data.contactMethod === "telegram" ? [`Telegram: ${telegramProfileUrl(data.telegram) || displayTextValue(data.telegram)}`] : []),
-  ...maxContactLine(data),
+  ...(data.contactMethod === "max" ? [`MAX: ${maxProfileUrl(data.max) || displayTextValue(data.max)}`] : []),
   `Что хочет заказать: ${displayTextValue(data.productType)}`,
   `Для кого: ${displayTextValue(data.recipient)}`,
   `Дата рождения: ${displayTextValue(data.birthDate)}`,

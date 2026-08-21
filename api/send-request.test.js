@@ -46,14 +46,13 @@ test("buildTelegramMessage formats all form fields and escapes HTML", () => {
   assert.doesNotMatch(message, /<b>MAX:<\/b>/);
 });
 
-test("buildTelegramMessage keeps a MAX nickname or entered value as plain text", () => {
-  const nameOnly = handler.buildTelegramMessage({ ...validRequest.body, contactMethod: "max", telegram: "", max: "olesia" });
+test("buildTelegramMessage keeps a MAX phone as text and makes a profile URL clickable", () => {
+  const phone = handler.buildTelegramMessage({ ...validRequest.body, contactMethod: "max", telegram: "", max: "+7 999 123-45-67" });
   const linked = handler.buildTelegramMessage({ ...validRequest.body, contactMethod: "max", telegram: "", max: "https://max.ru/olesia" });
 
-  assert.match(nameOnly, /<b>MAX:<\/b> olesia/);
-  assert.doesNotMatch(nameOnly, /href=.*olesia/);
-  assert.match(linked, /<b>MAX:<\/b> https:\/\/max\.ru\/olesia/);
-  assert.doesNotMatch(linked, /<a href=/);
+  assert.match(phone, /<b>MAX:<\/b> \+7 999 123-45-67/);
+  assert.doesNotMatch(phone, /href=.*123-45-67/);
+  assert.match(linked, /<b>MAX:<\/b> <a href="https:\/\/max\.ru\/olesia">https:\/\/max\.ru\/olesia<\/a>/);
 });
 
 test("handler rejects an incomplete request before calling Telegram", async () => {

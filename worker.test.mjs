@@ -115,6 +115,30 @@ test("POST sends a compact phone and unchanged MAX nickname to both services", a
   }
 });
 
+test("POST keeps a MAX phone as text and sends a profile link in supported formats", async (testContext) => {
+  const messages = [];
+  testContext.mock.method(context, "fetch", async (url, options) => {
+    messages.push({ url: String(url), body: JSON.parse(options.body) });
+    return String(url).includes("telegram")
+      ? new Response(JSON.stringify({ ok: true }), { status: 200 })
+      : new Response(null, { status: 200 });
+  });
+  const response = await context.worker.fetch(new Request(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: "Олеся", phone: "+7 999 123-45-67", contactMethod: "max", max: "https://max.ru/olesia",
+      productType: "Браслет", hardware: "Позолота", size: "17 см",
+    }),
+  }), { BOT_TOKEN: "token", CHAT_ID: "chat", MAX_BOT_TOKEN: "max-token", MAX_CHAT_ID: "max-chat" });
+
+  assert.equal(response.status, 200);
+  const telegram = messages.find(({ url }) => url.includes("telegram")).body.text;
+  const max = messages.find(({ url }) => url.includes("platform-api.max.ru")).body.text;
+  assert.match(telegram, /<a href="https:\/\/max\.ru\/olesia">https:\/\/max\.ru\/olesia<\/a>/);
+  assert.match(max, /MAX: https:\/\/max\.ru\/olesia/);
+});
+
 test("POST requires the conditional contact", async () => {
   const response = await context.worker.fetch(new Request(endpoint, {
     method: "POST",
