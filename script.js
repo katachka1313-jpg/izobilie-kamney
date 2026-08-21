@@ -185,6 +185,15 @@ const formatRussianPhone = (value) => {
   return formatted;
 };
 
+const normalizeRussianPhone = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  const nationalNumber = digits.length === 11 && /^[78]/.test(digits)
+    ? digits.slice(1)
+    : digits;
+
+  return nationalNumber.length === 10 ? `+7${nationalNumber}` : "";
+};
+
 const formatBirthDate = (value) => {
   const digits = value.replace(/\D/g, "").slice(0, 8);
   const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean);
@@ -225,7 +234,7 @@ const buildRequestPayload = (form) => {
 
   return {
     name: String(formData.get("name") || "").trim(),
-    phone: String(formData.get("phone") || "").trim(),
+    phone: normalizeRussianPhone(formData.get("phone")),
     contactMethod: String(formData.get("contact_method") || "").trim(),
     telegram: String(formData.get("telegram_contact") || "").trim(),
     max: String(formData.get("max_contact") || "").trim(),
@@ -300,6 +309,12 @@ if (requestForm instanceof HTMLFormElement) {
       );
     }
 
+    if (phoneInput instanceof HTMLInputElement) {
+      phoneInput.setCustomValidity(
+        normalizeRussianPhone(phoneInput.value) ? "" : "Введите российский номер из 10 цифр.",
+      );
+    }
+
     if (!requestForm.checkValidity()) {
       setRequestStatus("Пожалуйста, заполните все обязательные поля.");
       requestForm.reportValidity();
@@ -335,7 +350,10 @@ if (requestForm instanceof HTMLFormElement) {
       updateConditionalContactFields();
     } catch (error) {
       console.error("Order form submission failed", error);
-      setRequestStatus(error instanceof Error ? error.message : "Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
+      const message = error instanceof Error && error.message !== "Failed to fetch"
+        ? error.message
+        : "Не удалось отправить заявку. Проверьте соединение и попробуйте ещё раз или напишите мне в Telegram / MAX.";
+      setRequestStatus(message);
     } finally {
       if (submitButton instanceof HTMLButtonElement) {
         submitButton.disabled = false;

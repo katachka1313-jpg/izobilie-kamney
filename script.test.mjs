@@ -4,7 +4,7 @@ import test from "node:test";
 import vm from "node:vm";
 
 const source = `${await readFile(new URL("./script.js", import.meta.url), "utf8")}
-globalThis.testHelpers = { formatBirthDate, isValidBirthDate };`;
+globalThis.testHelpers = { formatBirthDate, isValidBirthDate, normalizeRussianPhone };`;
 const context = vm.createContext({
   console,
   Date,
@@ -37,4 +37,11 @@ test("birth date validation accepts empty or real dates and rejects impossible d
   assert.equal(context.testHelpers.isValidBirthDate("29.02.2024"), true);
   assert.equal(context.testHelpers.isValidBirthDate("31.02.1993"), false);
   assert.equal(context.testHelpers.isValidBirthDate("05011993"), false);
+});
+
+test("phone normalization accepts mobile input and returns compact +7 format", () => {
+  assert.equal(context.testHelpers.normalizeRussianPhone("+7 (926) 109-95-52"), "+79261099552");
+  assert.equal(context.testHelpers.normalizeRussianPhone("8 926 109 95 52"), "+79261099552");
+  assert.equal(context.testHelpers.normalizeRussianPhone("9261099552"), "+79261099552");
+  assert.equal(context.testHelpers.normalizeRussianPhone("+7 926"), "");
 });
