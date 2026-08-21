@@ -6,11 +6,13 @@ const ALLOWED_ORIGINS = new Set([
   "https://www.izobiliekamney.ru",
 ]);
 
-const REQUIRED_FIELDS = ["name", "phone", "contact", "productType", "hardware", "size"];
+const REQUIRED_FIELDS = ["name", "phone", "contactMethod", "productType", "hardware", "size"];
 const FIELD_LIMITS = {
   name: 100,
   phone: 30,
-  contact: 100,
+  contactMethod: 20,
+  telegram: 200,
+  max: 200,
   productType: 100,
   recipient: 100,
   birthDate: 20,
@@ -19,7 +21,8 @@ const FIELD_LIMITS = {
   colors: 200,
   wishes: 1000,
 };
-const RUSSIAN_PHONE_PATTERN = /^\+7\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+const RUSSIAN_PHONE_PATTERN = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+const CONTACT_METHODS = { telegram: "Telegram", max: "MAX", phone: "По телефону" };
 const BIRTH_DATE_PATTERN = /^(\d{2})\.(\d{2})\.(\d{4})$/;
 
 const getCorsHeaders = (request) => {
@@ -89,12 +92,52 @@ const escapeHtml = (value) => String(value || "")
 const displayValue = (value) => escapeHtml(String(value || "").trim() || "Не указано");
 const displayTextValue = (value) => String(value || "").trim() || "Не указано";
 
+const phoneHref = (phone) => `tel:${String(phone || "").replace(/\D/g, "").replace(/^7/, "+7")}`;
+
+const telegramProfileUrl = (contact) => {
+  const value = String(contact || "").trim();
+  const username = /^@([a-zA-Z0-9_]{5,32})$/.exec(value);
+
+  if (username) return `https://t.me/${username[1]}`;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname.toLowerCase() === "t.me" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+};
+
+const safeWebUrl = (value) => {
+  try {
+    const url = new URL(String(value || "").trim());
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+  } catch {
+    return "";
+  }
+};
+
+const telegramContactLine = (data) => {
+  if (data.contactMethod !== "telegram") return [];
+  const url = telegramProfileUrl(data.telegram);
+  const contact = displayValue(data.telegram);
+  return [`<b>Telegram:</b> ${url ? `<a href="${escapeHtml(url)}">${contact}</a>` : contact}`];
+};
+
+const maxContactLine = (data) => {
+  if (data.contactMethod !== "max") return [];
+  const url = safeWebUrl(data.max);
+  return [`MAX: ${url || displayTextValue(data.max)}`];
+};
+
 const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
   "",
   `<b>Имя:</b> ${displayValue(data.name)}`,
-  `<b>Телефон:</b> ${displayValue(data.phone)}`,
-  `<b>Дополнительный контакт:</b> ${displayValue(data.contact)}`,
+  `<b>Телефон:</b> <a href="${phoneHref(data.phone)}">${displayValue(data.phone)}</a>`,
+  `<b>Удобный способ связи:</b> ${displayValue(CONTACT_METHODS[data.contactMethod])}`,
+  ...telegramContactLine(data),
+  ...(data.contactMethod === "max" ? [`<b>MAX:</b> ${safeWebUrl(data.max) ? `<a href="${escapeHtml(safeWebUrl(data.max))}">${displayValue(data.max)}</a>` : displayValue(data.max)}`] : []),
   `<b>Что хочет заказать:</b> ${displayValue(data.productType)}`,
   `<b>Для кого:</b> ${displayValue(data.recipient)}`,
   `<b>Дата рождения:</b> ${displayValue(data.birthDate)}`,
@@ -108,8 +151,10 @@ const buildMaxMessage = (data) => [
   "💎 Новая заявка",
   "",
   `Имя: ${displayTextValue(data.name)}`,
-  `Телефон: ${displayTextValue(data.phone)}`,
-  `Дополнительный контакт: ${displayTextValue(data.contact)}`,
+  `Телефон: [${displayTextValue(data.phone)}](${phoneHref(data.phone)})`,
+  `Удобный способ связи: ${displayTextValue(CONTACT_METHODS[data.contactMethod])}`,
+  ...(data.contactMethod === "telegram" ? [`Telegram: ${telegramProfileUrl(data.telegram) || displayTextValue(data.telegram)}`] : []),
+  ...maxContactLine(data),
   `Что хочет заказать: ${displayTextValue(data.productType)}`,
   `Для кого: ${displayTextValue(data.recipient)}`,
   `Дата рождения: ${displayTextValue(data.birthDate)}`,
@@ -167,7 +212,7 @@ const sendToMax = async (data, env) => {
         Authorization: env.MAX_BOT_TOKEN,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: buildMaxMessage(data) }),
+      body: JSON.stringify({ text: buildMaxMessage(data), format: "markdown" }),
     });
 
     if (!response.ok) {
@@ -201,6 +246,12 @@ const handlePost = async (request, env) => {
 
   if (hasMissingFields) {
     return errorResponse(request, "Заполните все обязательные поля.", 400);
+  }
+
+  if (!CONTACT_METHODS[data.contactMethod]
+    || (data.contactMethod === "telegram" && !String(data.telegram || "").trim())
+    || (data.contactMethod === "max" && !String(data.max || "").trim())) {
+    return errorResponse(request, "Укажите способ связи и контакт для выбранного способа.", 400);
   }
 
   if (!RUSSIAN_PHONE_PATTERN.test(String(data.phone).trim())) {

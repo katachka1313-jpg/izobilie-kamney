@@ -146,6 +146,11 @@ const requestForm = document.querySelector("#request-form");
 const requestStatus = document.querySelector("#request-status");
 const phoneInput = requestForm?.querySelector('input[name="phone"]');
 const birthDateInput = requestForm?.querySelector('input[name="birthdate"]');
+const contactMethodInput = requestForm?.querySelector('select[name="contact_method"]');
+const telegramContactInput = requestForm?.querySelector('input[name="telegram_contact"]');
+const maxContactInput = requestForm?.querySelector('input[name="max_contact"]');
+const telegramContactField = document.querySelector("#telegram-contact-field");
+const maxContactField = document.querySelector("#max-contact-field");
 
 const formatRussianPhone = (value) => {
   const digits = value.replace(/\D/g, "");
@@ -158,7 +163,7 @@ const formatRussianPhone = (value) => {
   let formatted = "+7";
 
   if (area) {
-    formatted += `(${area}`;
+    formatted += ` (${area}`;
   }
 
   if (area.length === 3) {
@@ -221,7 +226,9 @@ const buildRequestPayload = (form) => {
   return {
     name: String(formData.get("name") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
-    contact: String(formData.get("additional_contact") || "").trim(),
+    contactMethod: String(formData.get("contact_method") || "").trim(),
+    telegram: String(formData.get("telegram_contact") || "").trim(),
+    max: String(formData.get("max_contact") || "").trim(),
     productType: String(formData.get("jewelry") || "").trim(),
     recipient: String(formData.get("recipient") || "").trim(),
     hardware: String(formData.get("furniture") || "").trim(),
@@ -233,6 +240,29 @@ const buildRequestPayload = (form) => {
     createdAt: new Date().toISOString(),
   };
 };
+
+const updateConditionalContactFields = () => {
+  const method = contactMethodInput instanceof HTMLSelectElement ? contactMethodInput.value : "";
+  const usesTelegram = method === "telegram";
+  const usesMax = method === "max";
+
+  if (telegramContactField instanceof HTMLElement && telegramContactInput instanceof HTMLInputElement) {
+    telegramContactField.hidden = !usesTelegram;
+    telegramContactInput.required = usesTelegram;
+    telegramContactInput.disabled = !usesTelegram;
+  }
+
+  if (maxContactField instanceof HTMLElement && maxContactInput instanceof HTMLInputElement) {
+    maxContactField.hidden = !usesMax;
+    maxContactInput.required = usesMax;
+    maxContactInput.disabled = !usesMax;
+  }
+};
+
+if (contactMethodInput instanceof HTMLSelectElement) {
+  contactMethodInput.addEventListener("change", updateConditionalContactFields);
+  updateConditionalContactFields();
+}
 
 if (phoneInput instanceof HTMLInputElement) {
   phoneInput.addEventListener("input", () => {
@@ -302,6 +332,7 @@ if (requestForm instanceof HTMLFormElement) {
 
       setRequestStatus("Спасибо! Заявка отправлена. Я свяжусь с вами в ближайшее время.", "success");
       requestForm.reset();
+      updateConditionalContactFields();
     } catch (error) {
       console.error("Order form submission failed", error);
       setRequestStatus(error instanceof Error ? error.message : "Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");

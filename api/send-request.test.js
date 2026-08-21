@@ -7,8 +7,9 @@ const validRequest = {
   method: "POST",
   body: {
     name: "Олеся <Ч>",
-    phone: "+7(999) 123-45-67",
-    contact: "@olesia",
+    phone: "+7 (999) 123-45-67",
+    contactMethod: "telegram",
+    telegram: "@olesia",
     productType: "Браслет",
     recipient: "Для себя",
     birthDate: "01.02.1990",
@@ -35,6 +36,19 @@ test("buildTelegramMessage formats all form fields and escapes HTML", () => {
   assert.match(message, /<b>Имя:<\/b> Олеся &lt;Ч&gt;/);
   assert.match(message, /<b>Цвет:<\/b> Зелёный &amp; белый/);
   assert.match(message, /<b>Дата рождения:<\/b> 01\.02\.1990/);
+  assert.match(message, /<b>Телефон:<\/b> <a href="tel:\+79991234567">\+7 \(999\) 123-45-67<\/a>/);
+  assert.match(message, /<b>Удобный способ связи:<\/b> Telegram/);
+  assert.match(message, /<b>Telegram:<\/b> <a href="https:\/\/t\.me\/olesia">@olesia<\/a>/);
+  assert.doesNotMatch(message, /<b>MAX:<\/b>/);
+});
+
+test("buildTelegramMessage keeps a MAX name as text and links a full profile URL", () => {
+  const nameOnly = handler.buildTelegramMessage({ ...validRequest.body, contactMethod: "max", telegram: "", max: "olesia" });
+  const linked = handler.buildTelegramMessage({ ...validRequest.body, contactMethod: "max", telegram: "", max: "https://max.ru/olesia" });
+
+  assert.match(nameOnly, /<b>MAX:<\/b> olesia/);
+  assert.doesNotMatch(nameOnly, /href=.*olesia/);
+  assert.match(linked, /<b>MAX:<\/b> <a href="https:\/\/max\.ru\/olesia">/);
 });
 
 test("handler rejects an incomplete request before calling Telegram", async () => {

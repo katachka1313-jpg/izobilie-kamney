@@ -11,7 +11,9 @@ const context = vm.createContext({
   HTMLAnchorElement: class {},
   HTMLButtonElement: class {},
   HTMLFormElement: class {},
+  HTMLElement: class {},
   HTMLInputElement: class {},
+  HTMLSelectElement: class {},
   document: {
     querySelector: () => null,
     querySelectorAll: () => [],
