@@ -26,7 +26,8 @@ const scrollToExamplesOnInitialLoad = () => {
     return;
   }
 
-  const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height || 0;
+  const siteHeader = document.querySelector(".site-header");
+  const headerHeight = siteHeader ? siteHeader.getBoundingClientRect().height : 0;
   const targetTop = examplesSection.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
   const shouldReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -57,8 +58,8 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
     });
   };
 
-  prev?.addEventListener("click", () => showImage(activeIndex - 1));
-  next?.addEventListener("click", () => showImage(activeIndex + 1));
+  if (prev) prev.addEventListener("click", () => showImage(activeIndex - 1));
+  if (next) next.addEventListener("click", () => showImage(activeIndex + 1));
 });
 
 
@@ -83,8 +84,8 @@ document.querySelectorAll("[data-works-carousel]").forEach((carousel) => {
     track.scrollBy({ left: getStep() * direction, behavior: "smooth" });
   };
 
-  prev?.addEventListener("click", () => scrollByCard(-1));
-  next?.addEventListener("click", () => scrollByCard(1));
+  if (prev) prev.addEventListener("click", () => scrollByCard(-1));
+  if (next) next.addEventListener("click", () => scrollByCard(1));
 });
 
 document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
@@ -125,8 +126,8 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
     }, 0);
   };
 
-  prev?.addEventListener("click", () => scrollToSlide(activeIndex - 1));
-  next?.addEventListener("click", () => scrollToSlide(activeIndex + 1));
+  if (prev) prev.addEventListener("click", () => scrollToSlide(activeIndex - 1));
+  if (next) next.addEventListener("click", () => scrollToSlide(activeIndex + 1));
 
   dots.forEach((dot) => {
     dot.addEventListener("click", () => scrollToSlide(Number(dot.dataset.stonesDot)));
@@ -144,11 +145,11 @@ const FORM_ENDPOINT = "https://izobilie-kamney-form.katachka1313.workers.dev/";
 
 const requestForm = document.querySelector("#request-form");
 const requestStatus = document.querySelector("#request-status");
-const phoneInput = requestForm?.querySelector('input[name="phone"]');
-const birthDateInput = requestForm?.querySelector('input[name="birthdate"]');
-const contactMethodInput = requestForm?.querySelector('select[name="contact_method"]');
-const telegramContactInput = requestForm?.querySelector('input[name="telegram_contact"]');
-const maxContactInput = requestForm?.querySelector('input[name="max_contact"]');
+const phoneInput = requestForm ? requestForm.querySelector('input[name="phone"]') : null;
+const birthDateInput = requestForm ? requestForm.querySelector('input[name="birthdate"]') : null;
+const contactMethodInput = requestForm ? requestForm.querySelector('select[name="contact_method"]') : null;
+const telegramContactInput = requestForm ? requestForm.querySelector('input[name="telegram_contact"]') : null;
+const maxContactInput = requestForm ? requestForm.querySelector('input[name="max_contact"]') : null;
 const telegramContactField = document.querySelector("#telegram-contact-field");
 const maxContactField = document.querySelector("#max-contact-field");
 
@@ -229,6 +230,12 @@ const setRequestStatus = (message, type = "") => {
   requestStatus.classList.toggle("is-success", type === "success");
 };
 
+const submissionErrorMessage = (error) => error instanceof TypeError
+  ? "Не удалось связаться с сервером. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
+  : error instanceof Error
+    ? error.message
+    : "Не удалось отправить заявку. Попробуйте ещё раз или напишите мне в Telegram / MAX.";
+
 const buildRequestPayload = (form) => {
   const formData = new FormData(form);
 
@@ -276,7 +283,11 @@ if (contactMethodInput instanceof HTMLSelectElement) {
 if (phoneInput instanceof HTMLInputElement) {
   phoneInput.addEventListener("input", () => {
     phoneInput.value = formatRussianPhone(phoneInput.value);
+    phoneInput.setCustomValidity("");
   });
+
+  // Mobile autofill can update a field without the same input sequence as typing.
+  phoneInput.addEventListener("change", () => phoneInput.setCustomValidity(""));
 
   phoneInput.addEventListener("focus", () => {
     if (!phoneInput.value) {
@@ -350,10 +361,7 @@ if (requestForm instanceof HTMLFormElement) {
       updateConditionalContactFields();
     } catch (error) {
       console.error("Order form submission failed", error);
-      const message = error instanceof Error && error.message !== "Failed to fetch"
-        ? error.message
-        : "Не удалось отправить заявку. Проверьте соединение и попробуйте ещё раз или напишите мне в Telegram / MAX.";
-      setRequestStatus(message);
+      setRequestStatus(submissionErrorMessage(error));
     } finally {
       if (submitButton instanceof HTMLButtonElement) {
         submitButton.disabled = false;
