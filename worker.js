@@ -48,6 +48,7 @@ const escapeHtml = (value) => String(value || "")
   .replaceAll(">", "&gt;");
 
 const displayValue = (value) => escapeHtml(String(value || "").trim() || "Не указано");
+const displayTextValue = (value) => String(value || "").trim() || "Не указано";
 
 const buildTelegramMessage = (data) => [
   "💎 <b>Новая заявка</b>",
@@ -64,12 +65,85 @@ const buildTelegramMessage = (data) => [
   `<b>Пожелания:</b> ${displayValue(data.wishes)}`,
 ].join("\n");
 
-const handlePost = async (request, env) => {
+const buildMaxMessage = (data) => [
+  "💎 Новая заявка",
+  "",
+  `Имя: ${displayTextValue(data.name)}`,
+  `Телефон: ${displayTextValue(data.phone)}`,
+  `Дополнительный контакт: ${displayTextValue(data.contact)}`,
+  `Что хочет заказать: ${displayTextValue(data.productType)}`,
+  `Для кого: ${displayTextValue(data.recipient)}`,
+  `Дата рождения: ${displayTextValue(data.birthDate)}`,
+  `Фурнитура: ${displayTextValue(data.hardware)}`,
+  `Размер: ${displayTextValue(data.size)}`,
+  `Цвет: ${displayTextValue(data.colors)}`,
+  `Пожелания: ${displayTextValue(data.wishes)}`,
+].join("\n");
+
+const sendToTelegram = async (data, env) => {
   if (!env.BOT_TOKEN || !env.CHAT_ID) {
-    console.error("BOT_TOKEN or CHAT_ID is not configured");
-    return errorResponse("Сервис отправки временно недоступен.", 500);
+    console.error("Telegram is not configured");
+    return false;
   }
 
+  try {
+    const response = await fetch(
+      `${TELEGRAM_API_BASE_URL}/bot${env.BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: env.CHAT_ID,
+          text: buildTelegramMessage(data),
+          parse_mode: "HTML",
+        }),
+      },
+    );
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || !result.ok) {
+      console.error("Telegram API rejected the request", response.status);
+      return false;
+    }
+
+    return true;
+  } catch {
+    console.error("Telegram request failed");
+    return false;
+  }
+};
+
+const sendToMax = async (data, env) => {
+  if (!env.MAX_BOT_TOKEN || !env.MAX_CHAT_ID) {
+    console.error("MAX is not configured");
+    return false;
+  }
+
+  try {
+    const url = new URL(`${MAX_API_BASE_URL}/messages`);
+    url.searchParams.set("chat_id", env.MAX_CHAT_ID);
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        Authorization: env.MAX_BOT_TOKEN,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: buildMaxMessage(data) }),
+    });
+
+    if (!response.ok) {
+      console.error("MAX API rejected the request", response.status);
+      return false;
+    }
+
+    return true;
+  } catch {
+    console.error("MAX request failed");
+    return false;
+  }
+};
+
+const handlePost = async (request, env) => {
   let data;
 
   try {
@@ -99,140 +173,22 @@ const handlePost = async (request, env) => {
     return errorResponse("Одно из полей заполнено слишком длинным текстом.", 400);
   }
 
-  try {
-    const telegramResponse = await fetch(
-      `${TELEGRAM_API_BASE_URL}/bot${env.BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: env.CHAT_ID,
-          text: buildTelegramMessage(data),
-          parse_mode: "HTML",
-        }),
-      },
-    );
-    const telegramResult = await telegramResponse.json().catch(() => ({}));
+  const [telegramSent, maxSent] = await Promise.all([
+    sendToTelegram(data, env),
+    sendToMax(data, env),
+  ]);
 
-    if (!telegramResponse.ok || !telegramResult.ok) {
-      console.error(
-        "Telegram API rejected the request",
-        telegramResponse.status,
-        telegramResult.description,
-      );
-      return errorResponse("Не удалось отправить заявку. Попробуйте ещё раз.", 502);
-    }
-
+  if (telegramSent || maxSent) {
     return jsonResponse({ success: true });
-  } catch (error) {
-    console.error("Telegram request failed", error);
-    return errorResponse(
-      "Не удалось отправить заявку. Проверьте соединение и попробуйте ещё раз.",
-      502,
-    );
-  }
-};
-
-const getMaxChatEvent = (update) => {
-  const eventType = update?.update_type;
-
-  if (!eventType) {
-    return null;
   }
 
-  const recipient = update.message?.recipient;
-  const isGroupMessage = eventType.startsWith("message_")
-    && ["chat", "group"].includes(recipient?.chat_type);
-  const isChatEvent = [
-    "bot_added",
-    "bot_removed",
-    "user_added",
-    "user_removed",
-    "chat_title_changed",
-  ].includes(eventType);
-
-  if (!isGroupMessage && !isChatEvent) {
-    return null;
-  }
-
-  const chatId = isGroupMessage ? recipient?.chat_id : update.chat_id;
-
-  if (chatId === undefined || chatId === null) {
-    return null;
-  }
-
-  const chatTitle = update.chat?.title
-    || recipient?.title
-    || recipient?.chat_title
-    || update.title;
-  const result = {
-    chat_id: chatId,
-    event_type: eventType,
-  };
-
-  if (typeof chatTitle === "string" && chatTitle.trim()) {
-    result.chat_title = chatTitle.trim();
-  }
-
-  return result;
-};
-
-const handleMaxChatId = async (env) => {
-  if (!env.MAX_BOT_TOKEN) {
-    console.error("MAX_BOT_TOKEN is not configured");
-    return errorResponse("Сервис определения chat_id временно недоступен.", 500);
-  }
-
-  try {
-    const maxResponse = await fetch(`${MAX_API_BASE_URL}/updates`, {
-      headers: { Authorization: env.MAX_BOT_TOKEN },
-    });
-
-    if (!maxResponse.ok) {
-      console.error("MAX API rejected the updates request", maxResponse.status);
-      return errorResponse("Не удалось получить события MAX. Попробуйте ещё раз.", 502);
-    }
-
-    const maxResult = await maxResponse.json().catch(() => null);
-
-    if (!maxResult || !Array.isArray(maxResult.updates)) {
-      console.error("MAX API returned an unexpected updates response");
-      return errorResponse("MAX вернул некорректный ответ. Попробуйте ещё раз.", 502);
-    }
-
-    const chats = maxResult.updates
-      .map(getMaxChatEvent)
-      .filter(Boolean)
-      .filter((event, index, events) => events.findIndex((candidate) => (
-        String(candidate.chat_id) === String(event.chat_id)
-        && candidate.event_type === event.event_type
-      )) === index);
-
-    if (chats.length === 0) {
-      return jsonResponse({
-        message: "События групповых чатов не найдены. Добавьте бота в группу и отправьте в группе тестовое сообщение, затем повторите запрос.",
-      });
-    }
-
-    return jsonResponse({ chats });
-  } catch {
-    console.error("MAX updates request failed");
-    return errorResponse("Не удалось получить события MAX. Попробуйте ещё раз.", 502);
-  }
+  return errorResponse("Не удалось отправить заявку. Попробуйте ещё раз.", 502);
 };
 
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
-    const url = new URL(request.url);
-
-    // GET /max-chat-id is the temporary diagnostic route for discovering MAX chat IDs.
-    // It must be handled before the form's POST-only method guard below.
-    if (request.method === "GET" && url.pathname === "/max-chat-id") {
-      return handleMaxChatId(env);
     }
 
     if (request.method !== "POST") {
