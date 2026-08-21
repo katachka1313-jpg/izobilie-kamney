@@ -36,7 +36,10 @@ test("buildTelegramMessage formats all form fields and escapes HTML", () => {
   assert.match(message, /<b>Имя:<\/b> Олеся &lt;Ч&gt;/);
   assert.match(message, /<b>Цвет:<\/b> Зелёный &amp; белый/);
   assert.match(message, /<b>Дата рождения:<\/b> 01\.02\.1990/);
-  assert.match(message, /<b>Телефон:<\/b> <a href="tel:\+79991234567">\+7 \(999\) 123-45-67<\/a>/);
+  assert.match(
+    message,
+    /<b>Телефон:<\/b> \+7 \(999\) 123-45-67 — <a href="tel:\+79991234567">📞 Позвонить<\/a>/,
+  );
   assert.match(message, /<b>Удобный способ связи:<\/b> Telegram/);
   assert.match(message, /<b>Telegram:<\/b> <a href="https:\/\/t\.me\/olesia">@olesia<\/a>/);
   assert.doesNotMatch(message, /<b>MAX:<\/b>/);
