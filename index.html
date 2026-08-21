@@ -816,7 +816,8 @@
             <div class="form-label-row">
               <label for="birthdate">Дата рождения</label>
             </div>
-            <input id="birthdate" type="text" name="birthdate" maxlength="20" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
+            <input id="birthdate" type="text" name="birthdate" maxlength="10" placeholder="ДД.ММ.ГГГГ" inputmode="numeric" autocomplete="bday" pattern="\d{2}\.\d{2}\.\d{4}" aria-describedby="birthdate-hint">
+            <small id="birthdate-hint">Формат: ДД.ММ.ГГГГ</small>
           </div>
           <div class="form-field">
             <div class="form-label-row">

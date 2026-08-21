@@ -145,6 +145,7 @@ const FORM_ENDPOINT = "https://izobilie-kamney-form.katachka1313.workers.dev/";
 const requestForm = document.querySelector("#request-form");
 const requestStatus = document.querySelector("#request-status");
 const phoneInput = requestForm?.querySelector('input[name="phone"]');
+const birthDateInput = requestForm?.querySelector('input[name="birthdate"]');
 
 const formatRussianPhone = (value) => {
   const digits = value.replace(/\D/g, "");
@@ -177,6 +178,32 @@ const formatRussianPhone = (value) => {
   }
 
   return formatted;
+};
+
+const formatBirthDate = (value) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean);
+
+  return parts.join(".");
+};
+
+const isValidBirthDate = (value) => {
+  if (!value) {
+    return true;
+  }
+
+  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
+
+  if (!match) {
+    return false;
+  }
+
+  const [, day, month, year] = match;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return date.getUTCFullYear() === Number(year)
+    && date.getUTCMonth() === Number(month) - 1
+    && date.getUTCDate() === Number(day);
 };
 
 const setRequestStatus = (message, type = "") => {
@@ -219,9 +246,29 @@ if (phoneInput instanceof HTMLInputElement) {
   });
 }
 
+if (birthDateInput instanceof HTMLInputElement) {
+  birthDateInput.addEventListener("input", () => {
+    birthDateInput.value = formatBirthDate(birthDateInput.value);
+    birthDateInput.setCustomValidity("");
+  });
+
+  birthDateInput.addEventListener("blur", () => {
+    birthDateInput.setCustomValidity(
+      isValidBirthDate(birthDateInput.value) ? "" : "Введите существующую дату в формате ДД.ММ.ГГГГ.",
+    );
+  });
+}
+
 if (requestForm instanceof HTMLFormElement) {
   requestForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    if (birthDateInput instanceof HTMLInputElement) {
+      birthDateInput.value = formatBirthDate(birthDateInput.value);
+      birthDateInput.setCustomValidity(
+        isValidBirthDate(birthDateInput.value) ? "" : "Введите существующую дату в формате ДД.ММ.ГГГГ.",
+      );
+    }
 
     if (!requestForm.checkValidity()) {
       setRequestStatus("Пожалуйста, заполните все обязательные поля.");
