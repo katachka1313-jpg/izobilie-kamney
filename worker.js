@@ -1,4 +1,5 @@
 const TELEGRAM_API_BASE_URL = "https://api.telegram.org";
+const MAX_API_BASE_URL = "https://platform-api.max.ru";
 
 // Origin GitHub Pages. If the repository is moved to another account,
 // replace this value with the new origin (without a trailing slash).
@@ -21,7 +22,7 @@ const RUSSIAN_PHONE_PATTERN = /^\+7\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Max-Age": "86400",
   Vary: "Origin",
@@ -132,10 +133,104 @@ const handlePost = async (request, env) => {
   }
 };
 
+const getMaxChatEvent = (update) => {
+  const eventType = update?.update_type;
+
+  if (!eventType) {
+    return null;
+  }
+
+  const recipient = update.message?.recipient;
+  const isGroupMessage = eventType.startsWith("message_")
+    && ["chat", "group"].includes(recipient?.chat_type);
+  const isChatEvent = [
+    "bot_added",
+    "bot_removed",
+    "user_added",
+    "user_removed",
+    "chat_title_changed",
+  ].includes(eventType);
+
+  if (!isGroupMessage && !isChatEvent) {
+    return null;
+  }
+
+  const chatId = isGroupMessage ? recipient?.chat_id : update.chat_id;
+
+  if (chatId === undefined || chatId === null) {
+    return null;
+  }
+
+  const chatTitle = update.chat?.title
+    || recipient?.title
+    || recipient?.chat_title
+    || update.title;
+  const result = {
+    chat_id: chatId,
+    event_type: eventType,
+  };
+
+  if (typeof chatTitle === "string" && chatTitle.trim()) {
+    result.chat_title = chatTitle.trim();
+  }
+
+  return result;
+};
+
+const handleMaxChatId = async (env) => {
+  if (!env.MAX_BOT_TOKEN) {
+    console.error("MAX_BOT_TOKEN is not configured");
+    return errorResponse("Сервис определения chat_id временно недоступен.", 500);
+  }
+
+  try {
+    const maxResponse = await fetch(`${MAX_API_BASE_URL}/updates`, {
+      headers: { Authorization: env.MAX_BOT_TOKEN },
+    });
+
+    if (!maxResponse.ok) {
+      console.error("MAX API rejected the updates request", maxResponse.status);
+      return errorResponse("Не удалось получить события MAX. Попробуйте ещё раз.", 502);
+    }
+
+    const maxResult = await maxResponse.json().catch(() => null);
+
+    if (!maxResult || !Array.isArray(maxResult.updates)) {
+      console.error("MAX API returned an unexpected updates response");
+      return errorResponse("MAX вернул некорректный ответ. Попробуйте ещё раз.", 502);
+    }
+
+    const chats = maxResult.updates
+      .map(getMaxChatEvent)
+      .filter(Boolean)
+      .filter((event, index, events) => events.findIndex((candidate) => (
+        String(candidate.chat_id) === String(event.chat_id)
+        && candidate.event_type === event.event_type
+      )) === index);
+
+    if (chats.length === 0) {
+      return jsonResponse({
+        message: "События групповых чатов не найдены. Добавьте бота в группу и отправьте в группе тестовое сообщение, затем повторите запрос.",
+      });
+    }
+
+    return jsonResponse({ chats });
+  } catch {
+    console.error("MAX updates request failed");
+    return errorResponse("Не удалось получить события MAX. Попробуйте ещё раз.", 502);
+  }
+};
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    const { pathname } = new URL(request.url);
+
+    if (request.method === "GET" && pathname === "/max-chat-id") {
+      return handleMaxChatId(env);
     }
 
     if (request.method !== "POST") {
