@@ -65,3 +65,13 @@ test("HTML starts conditional contacts disabled and loads the new script version
   assert.match(html, /name="max_contact"[^>]* disabled>/);
   assert.match(html, /<script src="script\.js\?v=9"><\/script>/);
 });
+
+test("header order button links to the on-page request form", async () => {
+  const html = await readFile(new URL("./index.html", import.meta.url), "utf8");
+  const styles = await readFile(new URL("./styles.css", import.meta.url), "utf8");
+
+  assert.match(html, /<a class="header-button" href="#request">Заказать украшение<\/a>/);
+  assert.match(html, /<section class="section request" id="request">/);
+  assert.match(html, /<form class="request-form" id="request-form">/);
+  assert.match(styles, /html\s*{[^}]*scroll-behavior:\s*smooth;/s);
+});
