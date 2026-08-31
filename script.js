@@ -142,6 +142,8 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
 });
 
 const FORM_ENDPOINT = "/api/request";
+const FORM_FALLBACK_ENDPOINT = "https://izobilie-kamney-form.katachka1313.workers.dev/";
+const FORM_ENDPOINTS = [FORM_ENDPOINT, FORM_FALLBACK_ENDPOINT];
 const FORM_REQUEST_TIMEOUT_MS = 20000;
 
 const requestForm = document.querySelector("#request-form");
@@ -239,12 +241,38 @@ const submissionErrorMessage = (error) => error && error.name === "AbortError"
     ? error.message
     : "Не удалось отправить заявку. Попробуйте ещё раз или напишите мне в Telegram / MAX.";
 
-const postRequest = async (payload) => {
+const fetchWithTimeout = async (endpoint, options) => {
   const supportsAbort = typeof AbortController !== "undefined";
   const controller = supportsAbort ? new AbortController() : null;
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), FORM_REQUEST_TIMEOUT_MS)
     : null;
+  const requestOptions = { ...options };
+
+  if (controller) {
+    requestOptions.signal = controller.signal;
+  }
+
+  try {
+    return await fetch(endpoint, requestOptions);
+  } finally {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+};
+
+const responseLooksLikeMissingWorkerRoute = (endpoint, response) => {
+  if (endpoint !== FORM_ENDPOINT) {
+    return false;
+  }
+
+  const contentType = String(response.headers.get("Content-Type") || "").toLowerCase();
+
+  return response.status === 404 || response.status === 405 || !contentType.includes("application/json");
+};
+
+const postRequest = async (payload) => {
   const options = {
     method: "POST",
     headers: {
@@ -252,22 +280,33 @@ const postRequest = async (payload) => {
     },
     body: JSON.stringify(payload),
   };
+  let lastError = null;
 
-  if (controller) {
-    options.signal = controller.signal;
-  }
+  for (const endpoint of FORM_ENDPOINTS) {
+    try {
+      console.info("Order form endpoint", new URL(endpoint, window.location.href).href);
+      const response = await fetchWithTimeout(endpoint, options);
 
-  try {
-    console.info("Order form endpoint", new URL(FORM_ENDPOINT, window.location.href).href);
-    return await fetch(FORM_ENDPOINT, options);
-  } catch (error) {
-    console.error("Order form fetch error", error);
-    throw error;
-  } finally {
-    if (timeoutId !== null) {
-      window.clearTimeout(timeoutId);
+      if (!responseLooksLikeMissingWorkerRoute(endpoint, response)) {
+        return response;
+      }
+
+      console.error("Order form route did not reach Worker", {
+        endpoint,
+        status: response.status,
+        contentType: response.headers.get("Content-Type") || "",
+      });
+    } catch (error) {
+      console.error("Order form fetch error", error);
+      lastError = error;
     }
   }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  throw new Error("Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
 };
 
 const buildRequestPayload = (form) => {
