@@ -6,7 +6,8 @@
 
 - `index.html` — структура страницы и контент.
 - `styles.css` — светлое пастельное оформление и адаптив.
-- `script.js` — мобильное меню.
+- `script.js` — мобильное меню и отправка заявки.
+- `worker.js` — Cloudflare Worker для отправки заявки в Telegram и MAX.
 - `assets/` — временные placeholder-фото украшений.
 
 ## Как открыть
@@ -15,9 +16,13 @@
 
 ## Отправка заявок через Cloudflare Worker
 
-Форма отправляет JSON на same-origin endpoint `POST /api/request`. Cloudflare route из
-`wrangler.toml` направляет только `izobiliekamney.ru/api/*` (а также `www`) в `worker.js`,
-поэтому остальная часть статического сайта продолжает обслуживаться прежним origin.
+Форма отправляет JSON на основной endpoint `POST /api/request`. Cloudflare route из
+`wrangler.toml` должен направлять только `izobiliekamney.ru/api/*` (а также `www`) в
+`worker.js`, поэтому остальная часть статического сайта продолжает обслуживаться прежним origin.
+
+В `script.js` оставлен временный fallback на `workers.dev`: он нужен только чтобы форма не
+становилась полностью нерабочей, пока production route `/api/request` ещё не подключён. Рабочее
+production-решение — именно `/api/request` на домене `izobiliekamney.ru`.
 
 Для production deployment:
 
@@ -25,7 +30,7 @@
 2. Задайте секреты: `npx wrangler secret put BOT_TOKEN`, `npx wrangler secret put CHAT_ID`,
    `npx wrangler secret put MAX_BOT_TOKEN` и `npx wrangler secret put MAX_CHAT_ID`.
 3. Выполните из корня репозитория:
-   `npx wrangler deploy worker.js --name izobilie-kamney-form --compatibility-date 2026-08-20`.
+   `npx wrangler deploy`.
 
 Деплой статического сайта на GitHub Pages **не деплоит Worker**. После деплоя откройте
 Cloudflare Dashboard → **Workers & Pages** → `izobilie-kamney-form` → **Settings** →
@@ -45,7 +50,7 @@ curl -i -X OPTIONS 'https://izobiliekamney.ru/api/request' \
 ```
 
 Ожидаются HTTP `204` и заголовок
-`Access-Control-Allow-Origin: https://izobiliekamney.ru`, а не HTML GitHub Pages.
+`Access-Control-Allow-Origin: https://izobiliekamney.ru`, а не HTML GitHub Pages/Fastly.
 
 Worker принимает `OPTIONS` и `POST` с `Content-Type: application/json`, проверяет origin и
 передаёт валидную заявку в Telegram и MAX. Секреты нельзя добавлять в `script.js` или коммитить.
