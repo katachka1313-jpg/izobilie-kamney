@@ -6,9 +6,10 @@ import vm from "node:vm";
 const source = `${await readFile(new URL("./script.js", import.meta.url), "utf8")}
 globalThis.testHelpers = { formatBirthDate, isValidBirthDate, normalizeRussianPhone, submissionErrorMessage };`;
 
-test("form uses the same-origin API route instead of workers.dev", () => {
+test("form uses same-origin API route before temporary workers.dev fallback", () => {
   assert.match(source, /const FORM_ENDPOINT = ["']\/api\/request["'];/);
-  assert.doesNotMatch(source, /workers\.dev/);
+  assert.match(source, /const FORM_FALLBACK_ENDPOINT = ["']https:\/\/izobilie-kamney-form\.katachka1313\.workers\.dev\/["'];/);
+  assert.match(source, /const FORM_ENDPOINTS = \[FORM_ENDPOINT, FORM_FALLBACK_ENDPOINT\];/);
 });
 const context = vm.createContext({
   console,
