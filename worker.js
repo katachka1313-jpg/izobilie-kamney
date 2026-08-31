@@ -52,6 +52,16 @@ const jsonResponse = (request, payload, status = 200, additionalHeaders = {}) =>
 
 const errorResponse = (request, error, status) => jsonResponse(request, { success: false, error }, status);
 
+const logWorkerError = (requestId, stage, error, status) => {
+  console.error("Form Worker error", {
+    requestId,
+    stage,
+    status,
+    errorName: error instanceof Error ? error.name : "UnknownError",
+    errorMessage: error instanceof Error ? error.message : String(error || "Unknown error"),
+  });
+};
+
 const normalizeBirthDate = (value) => {
   const trimmedValue = String(value || "").trim();
 
@@ -176,9 +186,9 @@ const buildMaxMessage = (data) => [
   `Пожелания: ${displayTextValue(data.wishes)}`,
 ].join("\n");
 
-const sendToTelegram = async (data, env) => {
+const sendToTelegram = async (data, env, requestId) => {
   if (!env.BOT_TOKEN || !env.CHAT_ID) {
-    console.error("Telegram is not configured");
+    logWorkerError(requestId, "telegram.configuration", new Error("Required binding is missing"));
     return false;
   }
 
@@ -198,20 +208,20 @@ const sendToTelegram = async (data, env) => {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok || !result.ok) {
-      console.error("Telegram API rejected the request", response.status);
+      logWorkerError(requestId, "telegram.response", new Error("Upstream rejected request"), response.status);
       return false;
     }
 
     return true;
-  } catch {
-    console.error("Telegram request failed");
+  } catch (error) {
+    logWorkerError(requestId, "telegram.fetch", error);
     return false;
   }
 };
 
-const sendToMax = async (data, env) => {
+const sendToMax = async (data, env, requestId) => {
   if (!env.MAX_BOT_TOKEN || !env.MAX_CHAT_ID) {
-    console.error("MAX is not configured");
+    logWorkerError(requestId, "max.configuration", new Error("Required binding is missing"));
     return false;
   }
 
@@ -228,23 +238,24 @@ const sendToMax = async (data, env) => {
     });
 
     if (!response.ok) {
-      console.error("MAX API rejected the request", response.status);
+      logWorkerError(requestId, "max.response", new Error("Upstream rejected request"), response.status);
       return false;
     }
 
     return true;
-  } catch {
-    console.error("MAX request failed");
+  } catch (error) {
+    logWorkerError(requestId, "max.fetch", error);
     return false;
   }
 };
 
-const handlePost = async (request, env) => {
+const handlePost = async (request, env, requestId) => {
   let data;
 
   try {
     data = await request.json();
-  } catch {
+  } catch (error) {
+    logWorkerError(requestId, "request.json", error, 400);
     return errorResponse(request, "Тело запроса должно содержать корректный JSON.", 400);
   }
 
@@ -284,8 +295,8 @@ const handlePost = async (request, env) => {
   }
 
   const [telegramSent, maxSent] = await Promise.all([
-    sendToTelegram(data, env),
-    sendToMax(data, env),
+    sendToTelegram(data, env, requestId),
+    sendToMax(data, env, requestId),
   ]);
 
   if (telegramSent || maxSent) {
@@ -297,7 +308,10 @@ const handlePost = async (request, env) => {
 
 export default {
   async fetch(request, env) {
+    const requestId = request.headers.get("CF-Ray") || `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const origin = request.headers.get("Origin");
+
+    console.info("Form Worker request", { requestId, method: request.method, origin: origin || "none" });
 
     if (origin && !ALLOWED_ORIGINS.has(origin)) {
       return errorResponse(request, "Origin не разрешён.", 403);
@@ -319,6 +333,11 @@ export default {
       return errorResponse(request, "Content-Type должен быть application/json.", 415);
     }
 
-    return handlePost(request, env);
+    try {
+      return await handlePost(request, env, requestId);
+    } catch (error) {
+      logWorkerError(requestId, "request.unhandled", error, 500);
+      return errorResponse(request, "Внутренняя ошибка обработки заявки.", 500);
+    }
   },
 };

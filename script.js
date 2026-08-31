@@ -232,9 +232,9 @@ const setRequestStatus = (message, type = "") => {
 };
 
 const submissionErrorMessage = (error) => error && error.name === "AbortError"
-  ? "Сервер не ответил вовремя. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
+  ? "Не удалось отправить заявку вовремя. Попробуйте ещё раз или напишите мне в Telegram / MAX."
   : error instanceof TypeError
-    ? "Не удалось связаться с сервером. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
+    ? "Не удалось отправить заявку. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
     : error instanceof Error
     ? error.message
     : "Не удалось отправить заявку. Попробуйте ещё раз или напишите мне в Telegram / MAX.";
@@ -258,7 +258,11 @@ const postRequest = async (payload) => {
   }
 
   try {
+    console.info("Order form endpoint", new URL(FORM_ENDPOINT, window.location.href).href);
     return await fetch(FORM_ENDPOINT, options);
+  } catch (error) {
+    console.error("Order form fetch error", error);
+    throw error;
   } finally {
     if (timeoutId !== null) {
       window.clearTimeout(timeoutId);
@@ -375,7 +379,17 @@ if (requestForm instanceof HTMLFormElement) {
     try {
       const response = await postRequest(payload);
 
-      const result = await response.json().catch(() => ({}));
+      const responseText = await response.text();
+      let result = {};
+
+      try {
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (error) {
+        console.error("Order form response is not JSON", error);
+      }
+
+      console.info("Order form HTTP status", response.status);
+      console.info("Order form response", result, responseText);
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || "Не удалось отправить заявку. Пожалуйста, попробуйте ещё раз или напишите мне в Telegram / MAX.");
