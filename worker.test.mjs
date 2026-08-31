@@ -8,10 +8,13 @@ const source = (await readFile(new URL("./worker.js", import.meta.url), "utf8"))
 const context = vm.createContext({
   console,
   Date,
+  AbortController,
   fetch,
   Headers,
   Request,
   Response,
+  clearTimeout,
+  setTimeout,
   URL,
 });
 

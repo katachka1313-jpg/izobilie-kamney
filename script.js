@@ -142,6 +142,7 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
 });
 
 const FORM_ENDPOINT = "https://izobilie-kamney-form.katachka1313.workers.dev/";
+const FORM_REQUEST_TIMEOUT_MS = 20000;
 
 const requestForm = document.querySelector("#request-form");
 const requestStatus = document.querySelector("#request-status");
@@ -230,11 +231,40 @@ const setRequestStatus = (message, type = "") => {
   requestStatus.classList.toggle("is-success", type === "success");
 };
 
-const submissionErrorMessage = (error) => error instanceof TypeError
-  ? "Не удалось связаться с сервером. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
-  : error instanceof Error
+const submissionErrorMessage = (error) => error && error.name === "AbortError"
+  ? "Сервер не ответил вовремя. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
+  : error instanceof TypeError
+    ? "Не удалось связаться с сервером. Проверьте интернет-соединение и попробуйте ещё раз или напишите мне в Telegram / MAX."
+    : error instanceof Error
     ? error.message
     : "Не удалось отправить заявку. Попробуйте ещё раз или напишите мне в Telegram / MAX.";
+
+const postRequest = async (payload) => {
+  const supportsAbort = typeof AbortController !== "undefined";
+  const controller = supportsAbort ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), FORM_REQUEST_TIMEOUT_MS)
+    : null;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  };
+
+  if (controller) {
+    options.signal = controller.signal;
+  }
+
+  try {
+    return await fetch(FORM_ENDPOINT, options);
+  } finally {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+};
 
 const buildRequestPayload = (form) => {
   const formData = new FormData(form);
@@ -339,16 +369,11 @@ if (requestForm instanceof HTMLFormElement) {
 
     if (submitButton instanceof HTMLButtonElement) {
       submitButton.disabled = true;
+      requestForm.setAttribute("aria-busy", "true");
     }
 
     try {
-      const response = await fetch(FORM_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await postRequest(payload);
 
       const result = await response.json().catch(() => ({}));
 
@@ -365,6 +390,7 @@ if (requestForm instanceof HTMLFormElement) {
     } finally {
       if (submitButton instanceof HTMLButtonElement) {
         submitButton.disabled = false;
+        requestForm.removeAttribute("aria-busy");
       }
     }
   });
