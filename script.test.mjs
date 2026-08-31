@@ -8,6 +8,7 @@ globalThis.testHelpers = { formatBirthDate, isValidBirthDate, normalizeRussianPh
 const context = vm.createContext({
   console,
   Date,
+  AbortController,
   HTMLAnchorElement: class {},
   HTMLButtonElement: class {},
   HTMLFormElement: class {},
@@ -22,6 +23,8 @@ const context = vm.createContext({
     addEventListener: () => {},
     location: { href: "https://izobiliekamney.ru/", hash: "" },
     matchMedia: () => ({ matches: true }),
+    setTimeout,
+    clearTimeout,
   },
 });
 
@@ -59,11 +62,12 @@ test("script remains parseable by Safari versions without optional chaining", ()
   assert.doesNotMatch(source, /\?\./);
 });
 
-test("HTML starts conditional contacts disabled and loads the new script version", async () => {
+test("HTML disables native validation races and starts conditional contacts disabled", async () => {
   const html = await readFile(new URL("./index.html", import.meta.url), "utf8");
+  assert.match(html, /<form class="request-form" id="request-form" novalidate>/);
   assert.match(html, /name="telegram_contact"[^>]* disabled>/);
   assert.match(html, /name="max_contact"[^>]* disabled>/);
-  assert.match(html, /<script src="script\.js\?v=9"><\/script>/);
+  assert.match(html, /<script src="script\.js\?v=10"><\/script>/);
 });
 
 test("header order button links to the on-page request form", async () => {
@@ -72,6 +76,6 @@ test("header order button links to the on-page request form", async () => {
 
   assert.match(html, /<a class="header-button" href="#request">Заказать украшение<\/a>/);
   assert.match(html, /<section class="section request" id="request">/);
-  assert.match(html, /<form class="request-form" id="request-form">/);
+  assert.match(html, /<form class="request-form" id="request-form" novalidate>/);
   assert.match(styles, /html\s*{[^}]*scroll-behavior:\s*smooth;/s);
 });

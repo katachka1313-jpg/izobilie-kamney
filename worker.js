@@ -1,5 +1,6 @@
 const TELEGRAM_API_BASE_URL = "https://api.telegram.org";
 const MAX_API_BASE_URL = "https://platform-api.max.ru";
+const DELIVERY_TIMEOUT_MS = 10000;
 
 const ALLOWED_ORIGINS = new Set([
   "https://izobiliekamney.ru",
@@ -123,6 +124,17 @@ const maxProfileUrl = (contact) => {
   }
 };
 
+const fetchWithTimeout = async (url, options) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
 const telegramContactLine = (data) => {
   if (data.contactMethod !== "telegram") return [];
   const url = telegramProfileUrl(data.telegram);
@@ -171,7 +183,7 @@ const sendToTelegram = async (data, env) => {
   }
 
   try {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `${TELEGRAM_API_BASE_URL}/bot${env.BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
@@ -206,7 +218,7 @@ const sendToMax = async (data, env) => {
   try {
     const url = new URL(`${MAX_API_BASE_URL}/messages`);
     url.searchParams.set("chat_id", env.MAX_CHAT_ID);
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithTimeout(url.toString(), {
       method: "POST",
       headers: {
         Authorization: env.MAX_BOT_TOKEN,
