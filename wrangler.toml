@@ -1,0 +1,9 @@
+name = "izobilie-kamney-form"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = false
+
+routes = [
+  { pattern = "izobiliekamney.ru/api/*", zone_name = "izobiliekamney.ru" },
+  { pattern = "www.izobiliekamney.ru/api/*", zone_name = "izobiliekamney.ru" },
+]

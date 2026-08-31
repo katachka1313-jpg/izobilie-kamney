@@ -13,15 +13,21 @@
 
 Откройте `index.html` в браузере. Сервер не требуется.
 
-## Отправка заявок в Telegram
+## Отправка заявок через Cloudflare Worker
 
-Форма отправляет данные в серверную функцию Vercel `api/send-request.js`. Для работы формы:
+Форма отправляет JSON на same-origin endpoint `POST /api/request`. Cloudflare route из
+`wrangler.toml` направляет только `izobiliekamney.ru/api/*` (а также `www`) в `worker.js`,
+поэтому остальная часть статического сайта продолжает обслуживаться прежним origin.
 
-1. Создайте бота через BotFather и добавьте его в нужную Telegram-группу.
-2. В настройках проекта Vercel добавьте переменные окружения `BOT_TOKEN` и `CHAT_ID` (пример имён есть в `.env.example`).
-3. Разверните проект на Vercel. Секреты нельзя добавлять в `script.js` или коммитить в репозиторий.
+Для production deployment:
 
-При локальном открытии только статического `index.html` серверная функция недоступна. Для полной проверки используйте Vercel CLI (`vercel dev`) с локальными переменными окружения.
+1. Убедитесь, что домен `izobiliekamney.ru` добавлен в тот же Cloudflare account и его DNS-записи проксируются Cloudflare.
+2. Задайте секреты: `npx wrangler secret put BOT_TOKEN`, `npx wrangler secret put CHAT_ID`,
+   `npx wrangler secret put MAX_BOT_TOKEN` и `npx wrangler secret put MAX_CHAT_ID`.
+3. Выполните `npx wrangler deploy` из корня репозитория.
+
+Worker принимает `OPTIONS` и `POST` с `Content-Type: application/json`, проверяет origin и
+передаёт валидную заявку в Telegram и MAX. Секреты нельзя добавлять в `script.js` или коммитить.
 
 ## Что заменить перед публикацией
 
