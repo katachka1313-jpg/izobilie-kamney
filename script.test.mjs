@@ -5,6 +5,11 @@ import vm from "node:vm";
 
 const source = `${await readFile(new URL("./script.js", import.meta.url), "utf8")}
 globalThis.testHelpers = { formatBirthDate, isValidBirthDate, normalizeRussianPhone, submissionErrorMessage };`;
+
+test("form uses the same-origin API route instead of workers.dev", () => {
+  assert.match(source, /const FORM_ENDPOINT = ["']\/api\/request["'];/);
+  assert.doesNotMatch(source, /workers\.dev/);
+});
 const context = vm.createContext({
   console,
   Date,
