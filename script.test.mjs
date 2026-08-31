@@ -59,7 +59,7 @@ test("network errors are replaced with a safe localized message", () => {
     'testHelpers.submissionErrorMessage(new TypeError("Failed to fetch"))',
     context,
   );
-  assert.match(message, /Не удалось связаться с сервером/);
+  assert.match(message, /Не удалось отправить заявку/);
   assert.doesNotMatch(message, /Failed to fetch/);
 });
 
@@ -72,7 +72,7 @@ test("HTML disables native validation races and starts conditional contacts disa
   assert.match(html, /<form class="request-form" id="request-form" novalidate>/);
   assert.match(html, /name="telegram_contact"[^>]* disabled>/);
   assert.match(html, /name="max_contact"[^>]* disabled>/);
-  assert.match(html, /<script src="script\.js\?v=10"><\/script>/);
+  assert.match(html, /<script src="script\.js\?v=11"><\/script>/);
 });
 
 test("header order button links to the on-page request form", async () => {
