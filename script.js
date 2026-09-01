@@ -141,9 +141,8 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
   updateDots(0);
 });
 
-const FORM_ENDPOINT = "/api/request";
-const FORM_FALLBACK_ENDPOINT = "https://izobilie-kamney-form.katachka1313.workers.dev/";
-const FORM_ENDPOINTS = [FORM_ENDPOINT, FORM_FALLBACK_ENDPOINT];
+const FORM_ENDPOINT = "https://api.izobiliekamney.ru/request";
+const FORM_ENDPOINTS = [FORM_ENDPOINT];
 const FORM_REQUEST_TIMEOUT_MS = 20000;
 
 const requestForm = document.querySelector("#request-form");
