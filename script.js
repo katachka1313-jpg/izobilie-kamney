@@ -141,7 +141,7 @@ document.querySelectorAll("[data-stones-carousel]").forEach((carousel) => {
   updateDots(0);
 });
 
-const FORM_ENDPOINT = "https://api.izobiliekamney.ru/request";
+const FORM_ENDPOINT = "https://functions.yandexcloud.net/d4eas79p1mddb40c31bq";
 const FORM_ENDPOINTS = [FORM_ENDPOINT];
 const FORM_REQUEST_TIMEOUT_MS = 20000;
 
